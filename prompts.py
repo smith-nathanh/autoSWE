@@ -81,15 +81,15 @@ TextCNN (Convolutional Neural Networks for Text Classification) is a convolution
 
 
 DESIGN_PROMPT = """
-Given the following PRD {prd}
+Given the following PRD {PRD}
 
 Return a dictionary with the following keys:
-* Create UML class diagram using mermaid syntax as key UML_class.md
-* Create  UML sequence diagram using mermaid syntax as key UML_sequence.md
-* Create architecture design as a text based representation of the file tree as key architecture_design.md
+* Create UML class diagram using mermaid syntax as key "UML_class"
+* Create  UML sequence diagram using mermaid syntax as key "UML_sequence"
+* Create architecture design as a text based representation of the file tree as key "architecture_design"
 """
 
-DESIGN_REVIEW_PROMPT = """
+APPROVE_DESIGN_PROMPT = """
 You are a senior software engineer who doesn't miss a thing. Review these documents under the following criteria and judge if they pass or fail:
 
 Evaluation Guidance for UML Class
@@ -157,18 +157,37 @@ Faithfulness
 • The architecture must be in strict accordance with the given PRD and UML class diagrams. It should accurately
 reflect the requirements specified in the PRD and the structural design outlined in the UML diagrams, ensuring a
 coherent and consistent development process.
+
+PRD.md
+-----------
+{PRD}
+
+
+UML_class.md
+-----------
+{UML_class}
+
+
+UML_sequence.md
+---------------
+{UML_sequence}
+
+
+architecture_design.md
+----------------------
+{architecture_design}
 """
 
 REQUIREMENTS_PROMPT = """
 
 Generate a requirements.txt pip-style to satisfy all the expected dependencies and include unittest as a requirement.
-Return a string that can be written to a file named requirements.txt
+Return a dictionary with key "requirements" and value should be a string that can be written to a file named requirements.txt
 
 Here are the input documents for you to reference:
 
 PRD.md
 -----------
-{prd}
+{PRD}
 
 
 UML_class.md
@@ -201,7 +220,7 @@ Here are the input documents for you to reference:
 
 PRD.md
 -----------
-{prd}
+{PRD}
 
 
 UML_class.md
@@ -234,7 +253,7 @@ Here are the input documents for you to reference:
 
 PRD.md
 -----------
-{prd}
+{PRD}
 
 
 UML_class.md
@@ -268,7 +287,7 @@ Here are the input documents for you to reference:
 
 PRD.md
 -----------
-{prd}
+{PRD}
 
 
 UML_class.md

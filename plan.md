@@ -21,6 +21,11 @@ We use langgraph to manage the control flow of the system. Decision nodes make d
 ![alt text](images/swegraph.png)
 
 
+## Logging
+Conversations/interactions are logged LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+
+![alt text](images/langsmith.png)
+
 ## Nodes of the Graph
 
 Note: *Evaluation* is included below for each node so that we can keep it in mind, but it wouldn't be run until after everything's produced - it's just here for context on what the end goal is. 
