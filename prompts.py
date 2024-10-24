@@ -90,7 +90,12 @@ Return a dictionary with the following keys:
 """
 
 APPROVE_DESIGN_PROMPT = """
-You are a senior software engineer who doesn't miss a thing. Review these documents under the following criteria and judge if they pass or fail:
+You are a senior software engineer who doesn't miss a thing. 
+
+Review the PRD, UML_class, UML_sequence, and architecture_design under the following Evalution Guidance and Faithfullness criteria 
+and judge if they pass or fail. 
+
+Return a dictionary with the following keys "UML_class", "UML_sequence", "architecture_design" and values as boolean.
 
 Evaluation Guidance for UML Class
 General Principles
@@ -210,11 +215,7 @@ IMPLEMENTATION_PROMPT = """
 
 Given the inputs I will pass below, follow the file hierarchy in the "architecture_design" and write each script one-at-a-time. 
 
-Separate the scripts in your response by a delimiter like this: 
-
-----------
-filename.py
------------
+Add each script you generate to the dictionary with the key as the file name and the value as the script content.
 
 Here are the input documents for you to reference:
 
@@ -249,6 +250,8 @@ ACCEPTANCE_TEST_PROMPT = """
 Given the inputs, generate appropriate acceptance tests in one file ensuring the software adheres to requirements in the PRD
 The acceptance tests must contain the test input (command to execute) and the expected output.
 
+Return a dictionary with key as "acceptance_tests" and value the string that can be written to a python file. 
+
 Here are the input documents for you to reference:
 
 PRD.md
@@ -282,6 +285,8 @@ UNIT_TEST_PROMPT = """
 Given the inputs I will pass below, generate appropriate unit tests ensuring the software adheres to requirements in the PRD. 
 
 Pay special attention to the UML class diagram and the architecture design.
+
+Return a dictionary with key as "unit_test" and value the string that can be written to a python file.
 
 Here are the input documents for you to reference:
 

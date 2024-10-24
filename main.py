@@ -36,5 +36,4 @@ if __name__ == "__main__":
     logging.info('TRACING %s', str(utils.tracing_is_enabled()))
     logging.info(os.environ["LANGCHAIN_PROJECT"])
     llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
-    #llm.invoke("Hello, world")
     main()

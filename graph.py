@@ -10,18 +10,11 @@ import logging
 class GraphState(TypedDict):
     """
     Represents the state of our graph.
-
-    Attributes:
-        prompt: prompt
-        documents: dictionary of documents
     """
     prompt: str
     messages: List[str]
     approvals: Dict[str, bool]
-    code: str
-    tests_acceptance: str
-    test_unit: str
-    documents: Dict[str, Document]
+    documents: Dict[str, Union[str, Document, Dict[str, str]]]
 
 def software_design(state: GraphState):
     """
@@ -36,7 +29,8 @@ def software_design(state: GraphState):
                  "UML_class": "UML class diagram using mermaid syntax",
                  "UML_sequence": "UML sequence diagram using mermaid syntax",
                  "architecture_design": "Architecture design as a text based representation of the file tree"}
-    return {"documents": documents}
+    state["documents"].update(documents)
+    return state
 
 def approve_software_design(state: GraphState):
     """
@@ -68,7 +62,7 @@ def requirements(state: GraphState):
                                         UML_class=state["documents"]["UML_class"],
                                         UML_sequence=state["documents"]["UML_sequence"],
                                         architecture_design=state["documents"]["architecture_design"])
-    #requirements = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    #reqs = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
     reqs = {"requirements": "requirements.txt"} # temporary response
     state["documents"].update(reqs)
     return state
@@ -98,8 +92,9 @@ def implementation(state: GraphState):
                                           UML_sequence=state["documents"]["UML_sequence"],
                                           architecture_design=state["documents"]["architecture_design"],
                                           requirements=state["documents"]["requirements"])
-    #state["code"] = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    state['code'] = "code" # temporary response
+    #code = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    code = {"code": {"file1": "code", "file2": "code"}} # temporary response
+    state['documents'].update(code)
     return state
 
 def approve_implementation(state: GraphState):
@@ -127,9 +122,9 @@ def acceptance_tests(state: GraphState):
                                            UML_sequence=state["documents"]["UML_sequence"],
                                            architecture_design=state["documents"]["architecture_design"],
                                            requirements=state["documents"]["requirements"])
-    #acceptance_test_string = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    acceptance_test_string = "acceptance tests" # temporary response
-    state["tests_acceptance"] = acceptance_test_string
+    #test = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    test = {'acceptance_tests': "acceptance tests"} # temporary response
+    state["documents"].update(test)
     return state
 
 def approve_acceptance_tests(state: GraphState):
@@ -159,9 +154,9 @@ def unit_tests(state: GraphState):
                                      # also pass the code here or maybe chunk it
                                      # maybe don't pass all the other documents, just the code not sure yet
                                      )
-    #unit_tests_string = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    unit_test_string = "unit tests" # temporary response
-    state["tests_unit"] = unit_test_string
+    #test = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    test = {'unit_tests': "unit tests"} # temporary response
+    state["documents"].update(test)
     return state
 
 def approve_unit_tests(state: GraphState):
