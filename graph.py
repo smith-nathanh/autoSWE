@@ -5,7 +5,10 @@ from langgraph.graph import StateGraph, START, END
 from prompts import *
 from langchain_core.messages import HumanMessage
 import logging
+from langchain_openai import ChatOpenAI
 
+# need to find better place for this
+llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
 
 class GraphState(TypedDict):
     """
@@ -22,14 +25,14 @@ def software_design(state: GraphState):
     """
     logging.info("---SOFTWARE DESIGN---")
     design_prompt = DESIGN_PROMPT.format(PRD=state["documents"]["PRD"])
-    #response = llm.invoke([HumanMessage(content=design_prompt)]) # use structured outputs here
-    #state["documents"].update(response)
+    response = llm.invoke([HumanMessage(content=design_prompt)]) # use structured outputs here
+    state["documents"].update(response)
     # temporarily using hardcoded values
-    documents = {"PRD": state["documents"]["PRD"],
-                 "UML_class": "UML class diagram using mermaid syntax",
-                 "UML_sequence": "UML sequence diagram using mermaid syntax",
-                 "architecture_design": "Architecture design as a text based representation of the file tree"}
-    state["documents"].update(documents)
+    # documents = {"PRD": state["documents"]["PRD"],
+    #              "UML_class": "UML class diagram using mermaid syntax",
+    #              "UML_sequence": "UML sequence diagram using mermaid syntax",
+    #              "architecture_design": "Architecture design as a text based representation of the file tree"}
+    # state["documents"].update(documents)
     return state
 
 def approve_software_design(state: GraphState):
@@ -62,8 +65,8 @@ def requirements(state: GraphState):
                                         UML_class=state["documents"]["UML_class"],
                                         UML_sequence=state["documents"]["UML_sequence"],
                                         architecture_design=state["documents"]["architecture_design"])
-    #reqs = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    reqs = {"requirements": "requirements.txt"} # temporary response
+    reqs = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    #reqs = {"requirements": "requirements.txt"} # temporary response
     state["documents"].update(reqs)
     return state
 
@@ -92,8 +95,8 @@ def implementation(state: GraphState):
                                           UML_sequence=state["documents"]["UML_sequence"],
                                           architecture_design=state["documents"]["architecture_design"],
                                           requirements=state["documents"]["requirements"])
-    #code = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    code = {"code": {"file1": "code", "file2": "code"}} # temporary response
+    code = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    #code = {"code": {"file1": "code", "file2": "code"}} # temporary response
     state['documents'].update(code)
     return state
 
@@ -122,8 +125,8 @@ def acceptance_tests(state: GraphState):
                                            UML_sequence=state["documents"]["UML_sequence"],
                                            architecture_design=state["documents"]["architecture_design"],
                                            requirements=state["documents"]["requirements"])
-    #test = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    test = {'acceptance_tests': "acceptance tests"} # temporary response
+    test = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    #test = {'acceptance_tests': "acceptance tests"} # temporary response
     state["documents"].update(test)
     return state
 
@@ -154,8 +157,8 @@ def unit_tests(state: GraphState):
                                      # also pass the code here or maybe chunk it
                                      # maybe don't pass all the other documents, just the code not sure yet
                                      )
-    #test = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    test = {'unit_tests': "unit tests"} # temporary response
+    test = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    #test = {'unit_tests': "unit tests"} # temporary response
     state["documents"].update(test)
     return state
 
