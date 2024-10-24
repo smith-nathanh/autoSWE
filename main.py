@@ -27,7 +27,7 @@ def main():
             prd_content = prd_file.read()
 
     graph = build_graph()
-    graph.get_graph().draw_mermaid_png(output_file_path="swegraph.png")
+    graph.get_graph().draw_mermaid_png(output_file_path="images/swegraph.png")
     #graph.invoke({"prd": prd_content})
 
 
@@ -36,4 +36,5 @@ if __name__ == "__main__":
     logging.info(utils.tracing_is_enabled())
     logging.info(os.environ["LANGCHAIN_PROJECT"])
     llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
+    #llm.invoke("Hello, world")
     main()

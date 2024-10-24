@@ -1,10 +1,10 @@
-# Autonomous Software Engineering System
+# autoSWE
 
-* Devbench is the benchmark.
-* We first attempt python repositories.
+* Using DevBench as the benchmark dataset to test against
+* Focusing first on the python repositories
 
 
-The process of the system can be described as a graph, the 5 tasks below can be considered the primary nodes. Progression to the next node is determined by the Controller.
+The 5 evaluations in DevBench will serve as the primary nodes in the system. Progression to the next node is determined by either a controller LLM or hardcoded logic. 
 
 Tasks/Nodes:
 1. Software Design
@@ -13,13 +13,12 @@ Tasks/Nodes:
 4. Acceptance Testing
 5. Unit Testing
 
-### Central Controller
+### Control flow
 
-* There is a central controller that decides at each node in the graph whether that task is complete.
+We use langgraph to manage the control flow of the system. Decision nodes make decisions based on hard-coded rules or an LLM can be used to make the decision. They are prefixed with "approve_". 
 
-* This decision logic of the controller can be hardcode such as if Node.output == True then proceed along next edge or subjective e.g. LLM-as-a-judge
 
-We first get a baseline of one-shot through workflow, no doubling back. If it fails at any stage, then tough-luck all subsequent tests are zero.
+![alt text](images/swegraph.png)
 
 
 ## Nodes of the Graph
