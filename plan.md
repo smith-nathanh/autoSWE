@@ -4,7 +4,7 @@
 * Focusing first on the python repositories
 
 
-The 5 evaluations in DevBench will serve as the primary nodes in the system. Progression to the next node is determined by either a controller LLM or hardcoded logic. 
+The 5 evaluations in DevBench will serve as the primary nodes in the system. Progression to the next node is determined by hardcoded logic or an LLM in "approve_" prefixed nodes. 
 
 Tasks/Nodes:
 1. Software Design
@@ -13,12 +13,16 @@ Tasks/Nodes:
 4. Acceptance Testing
 5. Unit Testing
 
+
 ### Control flow
 
-We use langgraph to manage the control flow of the system. Decision nodes make decisions based on hard-coded rules or an LLM can be used to make the decision. They are prefixed with "approve_". 
+We use langgraph to manage the control flow of the system. Decision nodes make decisions based on hard-coded rules or an LLM can be used to make the decision. They are prefixed with "approve_". They have conditional edges to route the flow of the system. 
 
 
 ![alt text](images/swegraph.png)
+
+
+In the graph `state` we accumulate "documents" produced by each node in the graph these are our final artifacts/outputs.
 
 
 ## Logging
