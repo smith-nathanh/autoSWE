@@ -23,7 +23,7 @@ def main():
     if args.prd_path is None:
         prd_content = SAMPLE_PRD
     else:
-        with open(args.prd_path, 'r') as prd_file:
+        with open(args.prd_path, 'r', encoding="utf-8") as prd_file:
             prd_content = prd_file.read()
 
     graph = build_graph()
