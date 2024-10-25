@@ -44,16 +44,10 @@ def software_design(state: GraphState):
     Designs the markdown files for the software design.
     """
     logging.info("---SOFTWARE DESIGN---")
-    design_prompt = DESIGN_PROMPT.format(PRD=state["documents"]["PRD"])
+    design_prompt = DESIGN_PROMPT.format(**state['documents'])
     structured_llm = llm.with_structured_output(Design)
-    response = structured_llm.invoke([HumanMessage(content=design_prompt)]) # use structured outputs here
+    response = structured_llm.invoke([HumanMessage(content=design_prompt)])
     state["documents"].update(response.dict())
-    # temporarily using hardcoded values
-    # documents = {"PRD": state["documents"]["PRD"],
-    #              "UML_class": "UML class diagram using mermaid syntax",
-    #              "UML_sequence": "UML sequence diagram using mermaid syntax",
-    #              "architecture_design": "Architecture design as a text based representation of the file tree"}
-    # state["documents"].update(documents)
     return state
 
 def approve_software_design(state: GraphState):
@@ -61,10 +55,7 @@ def approve_software_design(state: GraphState):
     LLM-as-a-judge to review the design documents.
     """
     logging.info("------APPROVE SOFTWARE DESIGN---")
-    prompt = APPROVE_DESIGN_PROMPT.format(PRD=state["documents"]["PRD"],
-                                        UML_class=state["documents"]["UML_class"],
-                                        UML_sequence=state["documents"]["UML_sequence"],
-                                        architecture_design=state["documents"]["architecture_design"])
+    prompt = APPROVE_DESIGN_PROMPT.format(**state['documents'])
     #approvals = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
     # temporarily using hardcoded values
     state['approvals'] = {"UML_class": True, "UML_sequence": True, "architecture_design": True}
@@ -82,13 +73,9 @@ def requirements(state: GraphState):
     Based on the design documents, determine the requirements.txt file.
     """
     logging.info("---REQUIREMENTS---")
-    prompt = REQUIREMENTS_PROMPT.format(PRD=state["documents"]["PRD"],
-                                        UML_class=state["documents"]["UML_class"],
-                                        UML_sequence=state["documents"]["UML_sequence"],
-                                        architecture_design=state["documents"]["architecture_design"])
+    prompt = REQUIREMENTS_PROMPT.format(**state["documents"])
     structured_llm = llm.with_structured_output(Requirements)
-    reqs = structured_llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    #reqs = {"requirements": "requirements.txt"} # temporary response
+    reqs = structured_llm.invoke([HumanMessage(content=prompt)])
     state["documents"].update(reqs.dict())
     return state
 
@@ -112,15 +99,10 @@ def implementation(state: GraphState):
     Implement the software design.
     """
     logging.info("---IMPLEMENTATION---")
-    prompt = IMPLEMENTATION_PROMPT.format(PRD=state["documents"]["PRD"],
-                                          UML_class=state["documents"]["UML_class"],
-                                          UML_sequence=state["documents"]["UML_sequence"],
-                                          architecture_design=state["documents"]["architecture_design"],
-                                          requirements=state["documents"]["requirements"])
+    prompt = IMPLEMENTATION_PROMPT.format(**state["documents"])
     structured_llm = llm.with_structured_output(Implementation)
-    code = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    #code = {"file1": "code", "file2": "code"} # temporary response
-    state['documents'].update({"code": code.content})
+    code = structured_llm.invoke([HumanMessage(content=prompt)])
+    state['documents'].update(code.dict())
     return state
 
 def approve_implementation(state: GraphState):
@@ -143,14 +125,9 @@ def acceptance_tests(state: GraphState):
     Generate acceptance tests for the software.
     """
     logging.info("---ACCEPTANCE TESTS---")
-    prompt = ACCEPTANCE_TEST_PROMPT.format(PRD=state["documents"]["PRD"],
-                                           UML_class=state["documents"]["UML_class"],
-                                           UML_sequence=state["documents"]["UML_sequence"],
-                                           architecture_design=state["documents"]["architecture_design"],
-                                           requirements=state["documents"]["requirements"])
+    prompt = ACCEPTANCE_TEST_PROMPT.format(**state["documents"])
     structured_llm = llm.with_structured_output(AcceptanceTests)
-    test = structured_llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    #test = {'acceptance_tests': "acceptance tests"} # temporary response
+    test = structured_llm.invoke([HumanMessage(content=prompt)])
     state["documents"].update(test.dict())
     return state
 
@@ -173,17 +150,12 @@ def unit_tests(state: GraphState):
     Generate unit tests for the software.
     """
     logging.info("---UNIT TESTS---")
-    prompt = UNIT_TEST_PROMPT.format(PRD=state["documents"]["PRD"],
-                                     UML_class=state["documents"]["UML_class"],
-                                     UML_sequence=state["documents"]["UML_sequence"],
-                                     architecture_design=state["documents"]["architecture_design"],
-                                     requirements=state["documents"]["requirements"]
+    prompt = UNIT_TEST_PROMPT.format(**state["documents"]
                                      # also pass the code here or maybe chunk it
                                      # maybe don't pass all the other documents, just the code not sure yet
                                      )
     structured_llm = llm.with_structured_output(UnitTests)
-    test = structured_llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
-    #test = {'unit_tests': "unit tests"} # temporary response
+    test = structured_llm.invoke([HumanMessage(content=prompt)])
     state["documents"].update(test.dict())
     return state
 

@@ -85,7 +85,6 @@ documents:
         class DataLoader {
             +load_data()
             +preprocess_data()
-            +split_data()
         }
         class Trainer {
             +float learning_rate
@@ -93,75 +92,86 @@ documents:
             +int num_epochs
             +train()
             +evaluate()
-            +save_checkpoint()
-        }
-        class Tokenizer {
-            +load_tokenizer()
-            +tokenize(text)
         }
         class Logger {
             +log_training_loss()
             +log_accuracy()
         }
-        class Config {
-            +float learning_rate
-            +int batch_size
-            +int num_epochs
-            +int embedding_dim
-            +list kernel_sizes
-            +int max_length
-            +int save_every_n_epoch
-            +int train_log_per_k_batch
-            +int random_seed
+        class CheckpointManager {
+            +save_checkpoint()
+            +load_checkpoint()
         }
-        TextCNN --> Trainer
-        DataLoader --> Trainer
-        Tokenizer --> DataLoader
-        Logger --> Trainer
-        Config --> Trainer
-        Config --> TextCNN
-        Config --> DataLoader
-        Config --> Logger
+        TextCNN --> DataLoader : uses
+        Trainer --> TextCNN : trains
+        Trainer --> Logger : logs
+        Trainer --> CheckpointManager : manages
+        DataLoader --> "1" HuggingFaceDataset : loads
+        DataLoader --> "1" Tokenizer : uses
+        class HuggingFaceDataset {
+            +load_dataset()
+        }
+        class Tokenizer {
+            +tokenize()
+        }
   UML_sequence: |-
     sequenceDiagram
         participant User
         participant Main
-        participant Config
         participant DataLoader
-        participant Tokenizer
         participant TextCNN
         participant Trainer
         participant Logger
-        User->>Main: Run script with parameters
-        Main->>Config: Load configuration
-        Main->>DataLoader: Load and preprocess data
-        DataLoader->>Tokenizer: Tokenize text
-        DataLoader->>DataLoader: Split data
-        Main->>TextCNN: Initialize model
-        Main->>Trainer: Initialize trainer
-        Main->>Trainer: Train model
+        participant CheckpointManager
+        User->>Main: run training script
+        Main->>DataLoader: load and preprocess data
+        DataLoader-->>Main: return data
+        Main->>TextCNN: initialize model
+        Main->>Trainer: initialize with model and data
         loop for each epoch
-            Trainer->>Logger: Log training loss and accuracy
-            Trainer->>Trainer: Save checkpoint if needed
+            Trainer->>TextCNN: forward pass
+            TextCNN-->>Trainer: return predictions
+            Trainer->>Logger: log training loss and accuracy
+            Trainer->>CheckpointManager: save checkpoint if best accuracy
         end
-        Main->>Trainer: Evaluate model
-        Trainer->>Logger: Log evaluation results
-        User->>Main: Request testing
-        Main->>Trainer: Test model
-        Trainer->>Logger: Log test accuracy
-  architecture_design: |-
+        User->>Main: run testing script
+        Main->>DataLoader: load test data
+        DataLoader-->>Main: return test data
+        Main->>CheckpointManager: load best model checkpoint
+        CheckpointManager-->>Main: return model
+        Main->>Trainer: evaluate model on test data
+        Trainer->>Logger: log test accuracy
+  architecture_design: |
     project-root/
     │
-    ├── main.py
-    ├── config.py
-    ├── data_loader.py
-    ├── tokenizer.py
-    ├── model.py
-    ├── trainer.py
-    ├── logger.py
+    ├── data/
+    │   ├── __init__.py
+    │   ├── data_loader.py
+    │   └── preprocess.py
+    │
+    ├── models/
+    │   ├── __init__.py
+    │   └── text_cnn.py
+    │
+    ├── trainers/
+    │   ├── __init__.py
+    │   └── trainer.py
+    │
+    ├── utils/
+    │   ├── __init__.py
+    │   ├── logger.py
+    │   └── checkpoint_manager.py
+    │
+    ├── scripts/
+    │   ├── train.py
+    │   └── test.py
+    │
+    ├── tests/
+    │   ├── __init__.py
+    │   ├── test_training.py
+    │   └── test_evaluation.py
+    │
     ├── requirements.txt
-    └── outputs/
-        └── checkpoints/
+    └── README.md
   requirements: |-
     torch
     transformers
@@ -169,85 +179,314 @@ documents:
     evaluate
     unittest
   code:
-    main.py: |
+    data/__init__.py: ""
+    data/data_loader.py: |-
+      import datasets
+      from transformers import BertTokenizer
+
+      class DataLoader:
+          def __init__(self, tokenizer_name='bert-base-uncased', max_length=50):
+              self.tokenizer = BertTokenizer.from_pretrained(tokenizer_name)
+              self.max_length = max_length
+
+          def load_data(self):
+              dataset = datasets.load_dataset('imdb')
+              return dataset
+
+          def preprocess_data(self, dataset):
+              def tokenize_function(examples):
+                  return self.tokenizer(examples['text'], padding='max_length', truncation=True, max_length=self.max_length)
+
+              tokenized_datasets = dataset.map(tokenize_function, batched=True)
+              return tokenized_datasets
+    data/preprocess.py: |-
+      from sklearn.model_selection import train_test_split
+
+      def split_dataset(dataset, test_size=0.1):
+          train_dataset, val_dataset = train_test_split(dataset, test_size=test_size)
+          return train_dataset, val_dataset
+    models/__init__.py: ""
+    models/text_cnn.py: |-
+      import torch
+      import torch.nn as nn
+      import torch.nn.functional as F
+
+      class TextCNN(nn.Module):
+          def __init__(self, embedding_dim=300, kernel_sizes=[3, 4, 5], max_length=50, num_classes=2):
+              super(TextCNN, self).__init__()
+              self.embedding_dim = embedding_dim
+              self.kernel_sizes = kernel_sizes
+              self.max_length = max_length
+
+              self.convs = nn.ModuleList([
+                  nn.Conv2d(1, 100, (k, embedding_dim)) for k in kernel_sizes
+              ])
+
+              self.fc = nn.Linear(len(kernel_sizes) * 100, num_classes)
+
+          def forward(self, x):
+              x = x.unsqueeze(1)  # Add channel dimension
+              x = [F.relu(conv(x)).squeeze(3) for conv in self.convs]
+              x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x]
+              x = torch.cat(x, 1)
+              x = self.fc(x)
+              return x
+    trainers/__init__.py: ""
+    trainers/trainer.py: |-
+      import torch
+      import torch.nn as nn
+      import torch.optim as optim
+      from torch.utils.data import DataLoader
+      from sklearn.metrics import accuracy_score
+
+      class Trainer:
+          def __init__(self, model, learning_rate=0.001, batch_size=32, num_epochs=10, device='cpu'):
+              self.model = model
+              self.learning_rate = learning_rate
+              self.batch_size = batch_size
+              self.num_epochs = num_epochs
+              self.device = device
+              self.criterion = nn.CrossEntropyLoss()
+              self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
+
+          def train(self, train_dataset, val_dataset):
+              train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+              val_loader = DataLoader(val_dataset, batch_size=self.batch_size)
+
+              self.model.to(self.device)
+
+              for epoch in range(self.num_epochs):
+                  self.model.train()
+                  total_loss = 0
+                  for batch in train_loader:
+                      inputs, labels = batch['input_ids'].to(self.device), batch['label'].to(self.device)
+                      self.optimizer.zero_grad()
+                      outputs = self.model(inputs)
+                      loss = self.criterion(outputs, labels)
+                      loss.backward()
+                      self.optimizer.step()
+                      total_loss += loss.item()
+
+                  avg_loss = total_loss / len(train_loader)
+                  val_accuracy = self.evaluate(val_loader)
+                  print(f'Epoch {epoch+1}/{self.num_epochs}, Loss: {avg_loss:.4f}, Validation Accuracy: {val_accuracy:.4f}')
+
+          def evaluate(self, data_loader):
+              self.model.eval()
+              all_preds = []
+              all_labels = []
+              with torch.no_grad():
+                  for batch in data_loader:
+                      inputs, labels = batch['input_ids'].to(self.device), batch['label'].to(self.device)
+                      outputs = self.model(inputs)
+                      _, preds = torch.max(outputs, 1)
+                      all_preds.extend(preds.cpu().numpy())
+                      all_labels.extend(labels.cpu().numpy())
+              accuracy = accuracy_score(all_labels, all_preds)
+              return accuracy
+    utils/__init__.py: ""
+    utils/logger.py: |-
+      class Logger:
+          def __init__(self):
+              pass
+
+          def log_training_loss(self, loss, batch):
+              print(f'Batch {batch}, Loss: {loss:.4f}')
+
+          def log_accuracy(self, accuracy, epoch):
+              print(f'Epoch {epoch}, Accuracy: {accuracy:.4f}')
+    utils/checkpoint_manager.py: |-
+      import torch
+      import os
+
+      class CheckpointManager:
+          def __init__(self, output_dir):
+              self.output_dir = output_dir
+              os.makedirs(self.output_dir, exist_ok=True)
+
+          def save_checkpoint(self, model, epoch, accuracy):
+              checkpoint_path = os.path.join(self.output_dir, f'model_epoch_{epoch}_acc_{accuracy:.4f}.pt')
+              torch.save(model.state_dict(), checkpoint_path)
+
+          def load_checkpoint(self, model, checkpoint_path):
+              model.load_state_dict(torch.load(checkpoint_path))
+              return model
+    scripts/train.py: |-
       import argparse
       import torch
-      from config import Config
-      from data_loader import DataLoader
-      from tokenizer import Tokenizer
-      from model import TextCNN
-      from trainer import Trainer
-      from logger import Logger
-
-
-      def main():
-          parser = argparse.ArgumentParser(description='Train or test a TextCNN model.')
-          parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for training')
-          parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training')
-          parser.add_argument('--num_epochs', type=int, default=10, help='Number of epochs for training')
-          parser.add_argument('--embedding_dim', type=int, default=500, help='Dimension of embedding')
-          parser.add_argument('--kernel_sizes', nargs='+', type=int, default=[3, 4, 5], help='Kernel sizes')
-          parser.add_argument('--max_length', type=int, default=50, help='Maximum length of sequence')
-          parser.add_argument('--save_every_n_epoch', type=int, default=1, help='Save model every n epochs')
-          parser.add_argument('--train', action='store_true', help='Train the model')
-          parser.add_argument('--test', action='store_true', help='Test the model')
-          parser.add_argument('--output_dir', type=str, required=True, help='Output directory')
-          parser.add_argument('--gpu', action='store_true', help='Use GPU')
-          parser.add_argument('--train_log_per_k_batch', type=int, default=10, help='Log training loss every k batches')
-          parser.add_argument('--random_seed', type=int, default=42, help='Random seed')
-
-          args = parser.parse_args()
-
-          # Set device
-          device = torch.device('cuda' if args.gpu and torch.cuda.is_available() else 'cpu')
-
-          # Load configuration
-          config = Config(
-              learning_rate=args.learning_rate,
-              batch_size=args.batch_size,
-              num_epochs=args.num_epochs,
-              embedding_dim=args.embedding_dim,
-              kernel_sizes=args.kernel_sizes,
-              max_length=args.max_length,
-              save_every_n_epoch=args.save_every_n_epoch,
-              train_log_per_k_batch=args.train_log_per_k_batch,
-              random_seed=args.random_seed
-          )
-
-          # Load and preprocess data
-          data_loader = DataLoader(config)
-          tokenizer = Tokenizer()
-          data_loader.load_data()
-          data_loader.preprocess_data(tokenizer)
-          data_loader.split_data()
-
-          # Initialize model
-          model = TextCNN(config).to(device)
-
-          # Initialize trainer
-          logger = Logger()
-          trainer = Trainer(config, model, data_loader, logger, device)
-
-          if args.train:
-              # Train model
-              trainer.train()
-
-          if args.test:
-              # Test model
-              trainer.test()
-
+      from data.data_loader import DataLoader
+      from data.preprocess import split_dataset
+      from models.text_cnn import TextCNN
+      from trainers.trainer import Trainer
+      from utils.logger import Logger
+      from utils.checkpoint_manager import CheckpointManager
 
       if __name__ == '__main__':
-          main()
-  acceptance_tests: |-
+          parser = argparse.ArgumentParser(description='Train a TextCNN model.')
+          parser.add_argument('--learning_rate', type=float, default=0.01)
+          parser.add_argument('--num_epochs', type=int, default=10)
+          parser.add_argument('--batch_size', type=int, default=16)
+          parser.add_argument('--embedding_dim', type=int, default=300)
+          parser.add_argument('--kernel_sizes', nargs='+', type=int, default=[3, 4, 5])
+          parser.add_argument('--max_length', type=int, default=50)
+          parser.add_argument('--save_every_n_epoch', type=int, default=2)
+          parser.add_argument('--output_dir', type=str, required=True)
+          parser.add_argument('--gpu', action='store_true')
+          parser.add_argument('--train_log_per_k_batch', type=int, default=20)
+          parser.add_argument('--random_seed', type=int, default=42)
+          args = parser.parse_args()
+
+          device = torch.device('cuda' if args.gpu and torch.cuda.is_available() else 'cpu')
+
+          data_loader = DataLoader(max_length=args.max_length)
+          dataset = data_loader.load_data()
+          train_dataset, val_dataset = split_dataset(dataset['train'])
+
+          model = TextCNN(embedding_dim=args.embedding_dim, kernel_sizes=args.kernel_sizes, max_length=args.max_length)
+
+          trainer = Trainer(model, learning_rate=args.learning_rate, batch_size=args.batch_size, num_epochs=args.num_epochs, device=device)
+          logger = Logger()
+          checkpoint_manager = CheckpointManager(args.output_dir)
+
+          trainer.train(train_dataset, val_dataset)
+    scripts/test.py: |-
+      import argparse
+      import torch
+      from data.data_loader import DataLoader
+      from models.text_cnn import TextCNN
+      from trainers.trainer import Trainer
+      from utils.checkpoint_manager import CheckpointManager
+
+      if __name__ == '__main__':
+          parser = argparse.ArgumentParser(description='Test a TextCNN model.')
+          parser.add_argument('--output_dir', type=str, required=True)
+          parser.add_argument('--gpu', action='store_true')
+          args = parser.parse_args()
+
+          device = torch.device('cuda' if args.gpu and torch.cuda.is_available() else 'cpu')
+
+          data_loader = DataLoader()
+          test_dataset = data_loader.load_data()['test']
+
+          model = TextCNN()
+          checkpoint_manager = CheckpointManager(args.output_dir)
+          model = checkpoint_manager.load_checkpoint(model, 'best_model_checkpoint.pt')
+
+          trainer = Trainer(model, device=device)
+          test_accuracy = trainer.evaluate(test_dataset)
+          print(f'Test Accuracy: {test_accuracy:.4f}')
+    tests/__init__.py: ""
+    tests/test_training.py: |-
+      import unittest
+      import torch
+      from data.data_loader import DataLoader
+      from data.preprocess import split_dataset
+      from models.text_cnn import TextCNN
+      from trainers.trainer import Trainer
+
+      class TestTraining(unittest.TestCase):
+          def setUp(self):
+              self.data_loader = DataLoader(max_length=50)
+              dataset = self.data_loader.load_data()
+              self.train_dataset, self.val_dataset = split_dataset(dataset['train'])
+              self.model = TextCNN(embedding_dim=300, kernel_sizes=[3, 4, 5], max_length=50)
+              self.trainer = Trainer(self.model, learning_rate=0.01, batch_size=16, num_epochs=1, device='cpu')
+
+          def test_training(self):
+              self.trainer.train(self.train_dataset, self.val_dataset)
+              # Check if model parameters have been updated (i.e., training occurred)
+              for param in self.model.parameters():
+                  self.assertTrue(param.grad is not None)
+
+      if __name__ == '__main__':
+          unittest.main()
+    tests/test_evaluation.py: |-
+      import unittest
+      import torch
+      from data.data_loader import DataLoader
+      from models.text_cnn import TextCNN
+      from trainers.trainer import Trainer
+      from utils.checkpoint_manager import CheckpointManager
+
+      class TestEvaluation(unittest.TestCase):
+          def setUp(self):
+              self.data_loader = DataLoader()
+              self.test_dataset = self.data_loader.load_data()['test']
+              self.model = TextCNN()
+              self.checkpoint_manager = CheckpointManager('./outputs')
+              self.model = self.checkpoint_manager.load_checkpoint(self.model, 'best_model_checkpoint.pt')
+              self.trainer = Trainer(self.model, device='cpu')
+
+          def test_evaluation(self):
+              accuracy = self.trainer.evaluate(self.test_dataset)
+              self.assertGreaterEqual(accuracy, 0.6)
+
+      if __name__ == '__main__':
+          unittest.main()
+    requirements.txt: |-
+      torch
+      transformers
+      datasets
+      evaluate
+      unittest
+    README.md: |-
+      # TextCNN Sentiment Classification
+
+      This repository contains the implementation of a TextCNN model for sentiment classification on the IMDb dataset using PyTorch.
+
+      ## Project Structure
+
+      - `data/`: Contains data loading and preprocessing scripts.
+      - `models/`: Contains the TextCNN model definition.
+      - `trainers/`: Contains the training and evaluation logic.
+      - `utils/`: Contains utility scripts for logging and checkpoint management.
+      - `scripts/`: Contains scripts to train and test the model.
+      - `tests/`: Contains unit tests for training and evaluation.
+
+      ## Requirements
+
+      Install the required packages using:
+
+      ```
+      pip install -r requirements.txt
+      ```
+
+      ## Usage
+
+      To train the model, run:
+
+      ```
+      python scripts/train.py --output_dir './outputs'
+      ```
+
+      To test the model, run:
+
+      ```
+      python scripts/test.py --output_dir './outputs'
+      ```
+
+      ## License
+
+      This project is licensed under the MIT License.
+  acceptance_tests: |
+    # Acceptance Tests for TextCNN Model
+
     import unittest
     import subprocess
     import os
 
-    class TestTextCNNAcceptance(unittest.TestCase):
+    class TestTextCNNModel(unittest.TestCase):
         
         def setUp(self):
-            self.train_command = [
+            """Set up the environment for testing."""
+            self.output_dir = './outputs'
+            if not os.path.exists(self.output_dir):
+                os.makedirs(self.output_dir)
+
+        def test_training_mode(self):
+            """Test the training mode of the TextCNN model."""
+            # Run the training script
+            result = subprocess.run([
                 'python', 'main.py',
                 '--learning_rate', '0.01',
                 '--num_epochs', '10',
@@ -258,169 +497,118 @@ documents:
                 '--save_every_n_epoch', '2',
                 '--train',
                 '--gpu',
-                '--output_dir', './outputs',
+                '--output_dir', self.output_dir,
                 '--train_log_per_k_batch', '20',
                 '--random_seed', '20'
-            ]
-            self.test_command = [
-                'python', 'main.py',
-                '--test',
-                '--gpu',
-                '--output_dir', './outputs'
-            ]
+            ], capture_output=True, text=True)
 
-        def test_training_mode(self):
-            """Test the training mode of the TextCNN model."""
-            result = subprocess.run(self.train_command, capture_output=True, text=True)
-            self.assertEqual(result.returncode, 0, "Training script did not run successfully.")
-            
-            # Check if training loss decreases and accuracy is above 0.6
-            output = result.stdout
-            self.assertIn("Training loss decreased", output, "Training loss did not decrease.")
-            self.assertIn("Accuracy: ", output, "Accuracy not found in output.")
-            accuracy_line = [line for line in output.split('\n') if "Accuracy:" in line][-1]
-            accuracy = float(accuracy_line.split()[-1])
-            self.assertGreater(accuracy, 0.6, "Training accuracy is below 0.6.")
+            # Check if the training loss decreases and accuracy is above 0.6
+            self.assertIn('Training loss decreased', result.stdout)
+            self.assertIn('Evaluation accuracy: ', result.stdout)
+            accuracy_line = [line for line in result.stdout.split('\n') if 'Evaluation accuracy:' in line]
+            if accuracy_line:
+                accuracy = float(accuracy_line[0].split(': ')[1])
+                self.assertGreater(accuracy, 0.6)
 
         def test_testing_mode(self):
             """Test the testing mode of the TextCNN model."""
-            result = subprocess.run(self.test_command, capture_output=True, text=True)
-            self.assertEqual(result.returncode, 0, "Testing script did not run successfully.")
-            
-            # Check if test accuracy is above 0.6
-            output = result.stdout
-            self.assertIn("Test Accuracy: ", output, "Test accuracy not found in output.")
-            accuracy_line = [line for line in output.split('\n') if "Test Accuracy:" in line][-1]
-            accuracy = float(accuracy_line.split()[-1])
-            self.assertGreater(accuracy, 0.6, "Test accuracy is below 0.6.")
+            # Run the testing script
+            result = subprocess.run([
+                'python', 'main.py',
+                '--test',
+                '--gpu',
+                '--output_dir', self.output_dir
+            ], capture_output=True, text=True)
+
+            # Check if the test accuracy is above 0.6
+            self.assertIn('Test accuracy: ', result.stdout)
+            accuracy_line = [line for line in result.stdout.split('\n') if 'Test accuracy:' in line]
+            if accuracy_line:
+                accuracy = float(accuracy_line[0].split(': ')[1])
+                self.assertGreater(accuracy, 0.6)
 
     if __name__ == '__main__':
         unittest.main()
-  unit_tests: |
+  unit_tests: |-
     import unittest
     import torch
-    from model import TextCNN
-    from data_loader import DataLoader
-    from trainer import Trainer
-    from tokenizer import Tokenizer
-    from logger import Logger
-    from config import Config
+    from models.text_cnn import TextCNN
+    from trainers.trainer import Trainer
+    from utils.logger import Logger
+    from utils.checkpoint_manager import CheckpointManager
+    from data.data_loader import DataLoader
 
     class TestTextCNN(unittest.TestCase):
         def setUp(self):
-            self.config = Config(
-                learning_rate=0.01,
-                batch_size=16,
-                num_epochs=10,
-                embedding_dim=300,
-                kernel_sizes=[3, 4, 5],
-                max_length=50,
-                save_every_n_epoch=2,
-                train_log_per_k_batch=20,
-                random_seed=20
-            )
-            self.model = TextCNN(
-                embedding_dim=self.config.embedding_dim,
-                kernel_sizes=self.config.kernel_sizes,
-                max_length=self.config.max_length
-            )
+            self.embedding_dim = 300
+            self.kernel_sizes = [3, 4, 5]
+            self.max_length = 50
+            self.model = TextCNN(embedding_dim=self.embedding_dim, kernel_sizes=self.kernel_sizes, max_length=self.max_length)
 
-        def test_model_structure(self):
-            # Check if the model has the correct layers
-            self.assertTrue(hasattr(self.model, 'embedding'))
-            self.assertTrue(hasattr(self.model, 'convs'))
-            self.assertTrue(hasattr(self.model, 'fc'))
+        def test_textcnn_initialization(self):
+            self.assertEqual(self.model.embedding_dim, self.embedding_dim)
+            self.assertEqual(self.model.kernel_sizes, self.kernel_sizes)
+            self.assertEqual(self.model.max_length, self.max_length)
 
-        def test_forward_pass(self):
-            # Test a forward pass
-            input_data = torch.randint(0, 1000, (self.config.batch_size, self.config.max_length))
+        def test_textcnn_forward(self):
+            input_data = torch.randint(0, 1000, (32, self.max_length))  # batch_size=32
             output = self.model.forward(input_data)
-            self.assertEqual(output.shape[0], self.config.batch_size)
-
-    class TestDataLoader(unittest.TestCase):
-        def setUp(self):
-            self.data_loader = DataLoader()
-
-        def test_load_data(self):
-            # Test data loading
-            data = self.data_loader.load_data()
-            self.assertIsNotNone(data)
-
-        def test_preprocess_data(self):
-            # Test data preprocessing
-            data = self.data_loader.load_data()
-            preprocessed_data = self.data_loader.preprocess_data(data)
-            self.assertIsNotNone(preprocessed_data)
-
-        def test_split_data(self):
-            # Test data splitting
-            data = self.data_loader.load_data()
-            train_data, val_data = self.data_loader.split_data(data, split_ratio=0.1)
-            self.assertTrue(len(train_data) > len(val_data))
+            self.assertEqual(output.shape[0], 32)  # batch size
 
     class TestTrainer(unittest.TestCase):
         def setUp(self):
-            self.config = Config(
-                learning_rate=0.01,
-                batch_size=16,
-                num_epochs=10,
-                embedding_dim=300,
-                kernel_sizes=[3, 4, 5],
-                max_length=50,
-                save_every_n_epoch=2,
-                train_log_per_k_batch=20,
-                random_seed=20
-            )
-            self.model = TextCNN(
-                embedding_dim=self.config.embedding_dim,
-                kernel_sizes=self.config.kernel_sizes,
-                max_length=self.config.max_length
-            )
-            self.trainer = Trainer(
-                model=self.model,
-                config=self.config
-            )
+            self.learning_rate = 0.01
+            self.batch_size = 16
+            self.num_epochs = 10
+            self.data_loader = DataLoader()
+            self.data = self.data_loader.load_data()
+            self.model = TextCNN(embedding_dim=300, kernel_sizes=[3, 4, 5], max_length=50)
+            self.trainer = Trainer(model=self.model, data=self.data, learning_rate=self.learning_rate, batch_size=self.batch_size, num_epochs=self.num_epochs)
 
-        def test_train(self):
-            # Test training process
-            self.trainer.train()
-            self.assertTrue(self.trainer.current_epoch > 0)
+        def test_trainer_initialization(self):
+            self.assertEqual(self.trainer.learning_rate, self.learning_rate)
+            self.assertEqual(self.trainer.batch_size, self.batch_size)
+            self.assertEqual(self.trainer.num_epochs, self.num_epochs)
 
-        def test_evaluate(self):
-            # Test evaluation process
-            accuracy = self.trainer.evaluate()
-            self.assertGreaterEqual(accuracy, 0.6)
-
-    class TestTokenizer(unittest.TestCase):
-        def setUp(self):
-            self.tokenizer = Tokenizer()
-
-        def test_load_tokenizer(self):
-            # Test loading tokenizer
-            tokenizer = self.tokenizer.load_tokenizer()
-            self.assertIsNotNone(tokenizer)
-
-        def test_tokenize(self):
-            # Test tokenization
-            text = "This is a test sentence."
-            tokens = self.tokenizer.tokenize(text)
-            self.assertIsInstance(tokens, list)
+        def test_training_process(self):
+            initial_loss = self.trainer.train()
+            final_loss = self.trainer.train()
+            self.assertLess(final_loss, initial_loss)
 
     class TestLogger(unittest.TestCase):
         def setUp(self):
             self.logger = Logger()
 
         def test_log_training_loss(self):
-            # Test logging training loss
-            self.logger.log_training_loss(epoch=1, batch=1, loss=0.5)
-            # Assuming logger stores logs in a list
-            self.assertIn((1, 1, 0.5), self.logger.logs)
+            self.logger.log_training_loss(0.5)
+            self.assertIn(0.5, self.logger.training_losses)
 
         def test_log_accuracy(self):
-            # Test logging accuracy
-            self.logger.log_accuracy(epoch=1, accuracy=0.7)
-            # Assuming logger stores logs in a list
-            self.assertIn((1, 0.7), self.logger.logs)
+            self.logger.log_accuracy(0.8)
+            self.assertIn(0.8, self.logger.accuracies)
+
+    class TestCheckpointManager(unittest.TestCase):
+        def setUp(self):
+            self.checkpoint_manager = CheckpointManager()
+            self.model = TextCNN(embedding_dim=300, kernel_sizes=[3, 4, 5], max_length=50)
+
+        def test_save_and_load_checkpoint(self):
+            self.checkpoint_manager.save_checkpoint(self.model, 'test_checkpoint.pth')
+            loaded_model = self.checkpoint_manager.load_checkpoint('test_checkpoint.pth')
+            self.assertEqual(self.model.state_dict(), loaded_model.state_dict())
+
+    class TestDataLoader(unittest.TestCase):
+        def setUp(self):
+            self.data_loader = DataLoader()
+
+        def test_load_data(self):
+            data = self.data_loader.load_data()
+            self.assertIsNotNone(data)
+
+        def test_preprocess_data(self):
+            raw_data = ["This is a test.", "Another test."]
+            processed_data = self.data_loader.preprocess_data(raw_data)
+            self.assertEqual(len(processed_data), len(raw_data))
 
     if __name__ == '__main__':
         unittest.main()
