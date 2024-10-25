@@ -1,0 +1,310 @@
+messages:
+  - UML class diagram approved
+  - Code approved
+  - Acceptance tests passed
+  - Unit tests passed
+approvals:
+  UML_class: true
+  UML_sequence: true
+  architecture_design: true
+  requirements: true
+  implementation: true
+  acceptance_tests: true
+  unit_tests: true
+documents:
+  PRD: |
+    
+    # Introduction
+    The purpose of this project is to develop a code repository that implements the TextCNN model for movie review sentiment classification using the PyTorch library. This repository should include all the necessary components and features to support the development of the model.
+    # Goals
+    The objective of this project is to construct and evaluate a TextCNN model using the PyTorch library for text classification. This includes the data pre-processing, the training of the model and evaluation of the model performance via accuracy.
+    # Features and Functionalities
+    The following features and functionalities are expected in the project:
+    - Modeling: 
+        - ability to define and manage model-related settings such as kernel sizes, dimension of embedding, maximum length of sequence;
+        - ability to configure model training settings such as learning rate, batch size, number of epochs;
+        - ability to define the custom parameter during training such as number of epoch to save model and number of batch to log training loss;
+        - ability to save the model checkpoint with the highest evaluation accuracy during training;
+        - ability to reproduce the training and testing results when random seeds are fixed.
+        - ability to log training loss and accuracy for every k batches;
+        - ability to log loss and accuracy for both train and validation sets for each epoch;
+        - ability to calculate the accuracy of model output on test dataset;
+        - ability to construct the TextCNN model using PyTorch, where the structure of a TextCNN model consists of an embedding layer, a series of convolutional layers, a maximum pooling layer, relu activation function, and a fully connected layer in a fixed order.
+    - Data:
+        - ability to load and pre-process the IMDb dataset from HuggingFace datasets;
+        - ability to load `bert-base-uncased` tokenizer from HuggingFace transformers to convert text into vectors;
+        - ability to split the train dataset into train and validation sets, specify the split ratio to 0.1.
+    - Examples:
+        - example scripts to run the code for both training and testing.
+    # Technical Constraints
+    - The repository should support building modeling frameworks using pytorch. 
+    - The repository should support training model using pytorch instead of the trainer api of transformers.
+    # Requirements
+    ## Dependencies
+    - transformers library
+    - datasets library
+    - evaluate library
+    - PyTorch library
+    # Usage
+    To train a model, run the following script
+    ```bash
+    python main.py   --learning_rate 0.01   --num_epochs 10   --batch_size 16   --embedding_dim 300  --kernel_sizes 3 4 5  --max_length 50  --save_every_n_epoch 2  --train   --gpu   --output_dir './outputs'  --train_log_per_k_batch 20  --random_seed 20
+    ```
+    To test a trained checkpoint in a specified `output_dir`, run the following script. 
+    ```bash
+    python main.py   --test   --gpu   --output_dir './outputs'
+    ```
+    ## Command Line configuration arguments
+     - learning_rate (float, optional) - A value representing the learning rate for training, with a default value of 1e-3.
+     - batch_size (int, optional) - A value representing the batch size for training, with a default value of 32.
+     - num_epochs (int, optional) - A value representing the number of epochs for training, with a default value of 10.
+     - embedding_dim (int, optional) - A value representing the number of neurons in the layer, with a default value of 500.
+     - kernel_sizes (lis, optional) - A list of values representing the kernel sizes, with a default value of [3, 4, 5].
+     - max_length (int, optional) - A value representing the maximum length of sentences, with a default value of 50.
+     - save_every_n_epoch (int, optional) - A value representing the number of epochs to save the model, with a default value of 1.
+     - train (Boolean, optional) - A boolean value representing whether to train the model, with a default value of FALSE.
+     - test (Boolean, optional) - A boolean value representing whether to test the model, with a default value of FALSE.
+     - output_dir (str, required) - A string value representing the path to output directory.
+     - gpu (Boolean, optional) - A boolean value representing whether to use GPU, with a default value of FALSE.
+     - train_log_per_k_batch (int, optional) - A value representing the number of batch to log the training loss, with a default value of 10.
+     - random_seed (int, optional) - A value representing the random seed, with a default value of 42.
+    # Acceptance Criteria
+    The repository should cover acceptance testing for both training and testing modes, by setting command line parameter to `--train` and `--test`.
+    - For the training mode, the model training logs will be tested if the training loss decreases between the first epoch and the last epoch, and if the accuracy of the model evaluation results is above 0.6.
+    - For the testing mode, the terminal output will be tested whether the accuracy of the given trained model on the test dataset is above 0.6.
+    # Terms/Concepts Explanation
+    TextCNN (Convolutional Neural Networks for Text Classification) is a convolutional neural network model introduced by Yoon Kim in 2014. It works by constructing and training a convolutional neural network (CNN) model to classify text into predefined labels. The model performs well and is considered one of the widely applicable architectures for text classification. The IMDb dataset is a collection of over 25000 movie reviews from users on the Internet Movie Database website. The dataset is typically used to train or test machine learning models for movie sentiment analysis.
+  UML_class: |-
+    classDiagram
+        class TextCNN {
+            +int embedding_dim
+            +list kernel_sizes
+            +int max_length
+            +forward(x)
+        }
+        class DataLoader {
+            +load_data()
+            +preprocess_data()
+        }
+        class Trainer {
+            +float learning_rate
+            +int batch_size
+            +int num_epochs
+            +train()
+            +evaluate()
+            +save_checkpoint()
+        }
+        class Tokenizer {
+            +load_tokenizer()
+            +tokenize(text)
+        }
+        class Logger {
+            +log_training_loss()
+            +log_accuracy()
+        }
+        class Config {
+            +parse_arguments()
+        }
+        TextCNN --> Trainer : uses
+        DataLoader --> Trainer : provides data
+        Tokenizer --> DataLoader : tokenizes data
+        Logger --> Trainer : logs metrics
+        Config --> Trainer : provides settings
+        Config --> TextCNN : provides settings
+  UML_sequence: |-
+    sequenceDiagram
+        participant User
+        participant Config
+        participant DataLoader
+        participant Tokenizer
+        participant TextCNN
+        participant Trainer
+        participant Logger
+        User->>Config: parse_arguments()
+        Config->>DataLoader: load_data()
+        DataLoader->>Tokenizer: load_tokenizer()
+        Tokenizer->>DataLoader: tokenize(text)
+        DataLoader->>Trainer: provide preprocessed data
+        Config->>TextCNN: provide model settings
+        TextCNN->>Trainer: initialize model
+        Trainer->>Trainer: train()
+        loop every k batches
+            Trainer->>Logger: log_training_loss()
+        end
+        loop every epoch
+            Trainer->>Logger: log_accuracy()
+            Trainer->>Trainer: save_checkpoint()
+        end
+        Trainer->>Trainer: evaluate()
+        Trainer->>Logger: log final accuracy
+        User->>Trainer: test model
+        Trainer->>Logger: log test accuracy
+  architecture_design: |
+    project-root/
+    │
+    ├── data/
+    │   ├── __init__.py
+    │   ├── data_loader.py
+    │   └── tokenizer.py
+    │
+    ├── model/
+    │   ├── __init__.py
+    │   └── text_cnn.py
+    │
+    ├── trainer/
+    │   ├── __init__.py
+    │   └── trainer.py
+    │
+    ├── utils/
+    │   ├── __init__.py
+    │   ├── logger.py
+    │   └── config.py
+    │
+    ├── scripts/
+    │   ├── train.py
+    │   └── test.py
+    │
+    ├── outputs/
+    │   └── checkpoints/
+    │
+    ├── requirements.txt
+    └── README.md
+  requirements: |-
+    torch
+    transformers
+    datasets
+    evaluate
+    unittest
+  code: |-
+    ```json
+    {
+        "code": {
+            "data/__init__.py": "",
+            "data/data_loader.py": "import datasets\nfrom torch.utils.data import DataLoader, random_split\n\nclass DataLoader:\n    def __init__(self, batch_size, max_length, split_ratio=0.1):\n        self.batch_size = batch_size\n        self.max_length = max_length\n        self.split_ratio = split_ratio\n\n    def load_data(self):\n        dataset = datasets.load_dataset('imdb')\n        return dataset\n\n    def preprocess_data(self, dataset, tokenizer):\n        def tokenize_function(examples):\n            return tokenizer(examples['text'], padding='max_length', truncation=True, max_length=self.max_length)\n\n        tokenized_datasets = dataset.map(tokenize_function, batched=True)\n        train_size = int((1 - self.split_ratio) * len(tokenized_datasets['train']))\n        val_size = len(tokenized_datasets['train']) - train_size\n        train_dataset, val_dataset = random_split(tokenized_datasets['train'], [train_size, val_size])\n\n        train_dataloader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)\n        val_dataloader = DataLoader(val_dataset, batch_size=self.batch_size)\n        test_dataloader = DataLoader(tokenized_datasets['test'], batch_size=self.batch_size)\n\n        return train_dataloader, val_dataloader, test_dataloader\n",
+            "data/tokenizer.py": "from transformers import BertTokenizer\n\nclass Tokenizer:\n    def __init__(self, model_name='bert-base-uncased'):\n        self.tokenizer = BertTokenizer.from_pretrained(model_name)\n\n    def load_tokenizer(self):\n        return self.tokenizer\n\n    def tokenize(self, text):\n        return self.tokenizer(text, padding='max_length', truncation=True)\n",
+            "model/__init__.py": "",
+            "model/text_cnn.py": "import torch\nimport torch.nn as nn\nimport torch.nn.functional as F\n\nclass TextCNN(nn.Module):\n    def __init__(self, embedding_dim, kernel_sizes, max_length, num_classes=2):\n        super(TextCNN, self).__init__()\n        self.embedding_dim = embedding_dim\n        self.kernel_sizes = kernel_sizes\n        self.max_length = max_length\n\n        self.convs = nn.ModuleList([\n            nn.Conv2d(1, 100, (k, embedding_dim)) for k in kernel_sizes\n        ])\n\n        self.fc = nn.Linear(len(kernel_sizes) * 100, num_classes)\n\n    def forward(self, x):\n        x = x.unsqueeze(1)  # Add channel dimension\n        x = [F.relu(conv(x)).squeeze(3) for conv in self.convs]\n        x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x]\n        x = torch.cat(x, 1)\n        x = self.fc(x)\n        return x\n",
+            "trainer/__init__.py": "",
+            "trainer/trainer.py": "import torch\nimport torch.nn as nn\nimport torch.optim as optim\nfrom evaluate import load\n\nclass Trainer:\n    def __init__(self, model, learning_rate, batch_size, num_epochs, device):\n        self.model = model\n        self.learning_rate = learning_rate\n        self.batch_size = batch_size\n        self.num_epochs = num_epochs\n        self.device = device\n        self.criterion = nn.CrossEntropyLoss()\n        self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)\n        self.metric = load('accuracy')\n\n    def train(self, train_dataloader, val_dataloader, logger, save_every_n_epoch, output_dir):\n        self.model.to(self.device)\n        best_accuracy = 0\n        for epoch in range(self.num_epochs):\n            self.model.train()\n            total_loss = 0\n            for i, batch in enumerate(train_dataloader):\n                inputs, labels = batch['input_ids'].to(self.device), batch['labels'].to(self.device)\n                self.optimizer.zero_grad()\n                outputs = self.model(inputs)\n                loss = self.criterion(outputs, labels)\n                loss.backward()\n                self.optimizer.step()\n                total_loss += loss.item()\n                if (i + 1) % logger.train_log_per_k_batch == 0:\n                    logger.log_training_loss(epoch, i, total_loss / logger.train_log_per_k_batch)\n                    total_loss = 0\n            val_accuracy = self.evaluate(val_dataloader)\n            logger.log_accuracy(epoch, val_accuracy)\n            if val_accuracy > best_accuracy:\n                best_accuracy = val_accuracy\n                self.save_checkpoint(output_dir)\n\n    def evaluate(self, dataloader):\n        self.model.eval()\n        total_accuracy = 0\n        with torch.no_grad():\n            for batch in dataloader:\n                inputs, labels = batch['input_ids'].to(self.device), batch['labels'].to(self.device)\n                outputs = self.model(inputs)\n                predictions = torch.argmax(outputs, dim=1)\n                total_accuracy += self.metric.compute(predictions=predictions, references=labels)['accuracy']\n        return total_accuracy / len(dataloader)\n\n    def save_checkpoint(self, output_dir):\n        torch.save(self.model.state_dict(), f'{output_dir}/best_model.pth')\n",
+            "utils/__init__.py": "",
+            "utils/logger.py": "class Logger:\n    def __init__(self, train_log_per_k_batch):\n        self.train_log_per_k_batch = train_log_per_k_batch\n\n    def log_training_loss(self, epoch, batch, loss):\n        print(f'Epoch [{epoch+1}], Batch [{batch+1}], Loss: {loss:.4f}')\n\n    def log_accuracy(self, epoch, accuracy):\n        print(f'Epoch [{epoch+1}], Validation Accuracy: {accuracy:.4f}')\n\n    def log_final_accuracy(self, accuracy):\n        print(f'Final Test Accuracy: {accuracy:.4f}')\n",
+            "utils/config.py": "import argparse\n\ndef parse_arguments():\n    parser = argparse.ArgumentParser(description='TextCNN for Sentiment Analysis')\n    parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for training')\n    parser.add_argument('--batch_size', type=int, default=32, help='Batch size for training')\n    parser.add_argument('--num_epochs', type=int, default=10, help='Number of epochs for training')\n    parser.add_argument('--embedding_dim', type=int, default=500, help='Dimension of embedding layer')\n    parser.add_argument('--kernel_sizes', nargs='+', type=int, default=[3, 4, 5], help='Kernel sizes for convolutional layers')\n    parser.add_argument('--max_length', type=int, default=50, help='Maximum length of input sequences')\n    parser.add_argument('--save_every_n_epoch', type=int, default=1, help='Save model every n epochs')\n    parser.add_argument('--train', action='store_true', help='Flag to train the model')\n    parser.add_argument('--test', action='store_true', help='Flag to test the model')\n    parser.add_argument('--output_dir', type=str, required=True, help='Directory to save outputs')\n    parser.add_argument('--gpu', action='store_true', help='Flag to use GPU')\n    parser.add_argument('--train_log_per_k_batch', type=int, default=10, help='Log training loss every k batches')\n    parser.add_argument('--random_seed', type=int, default=42, help='Random seed for reproducibility')\n    return parser.parse_args()\n",
+            "scripts/train.py": "import torch\nfrom data.data_loader import DataLoader\nfrom data.tokenizer import Tokenizer\nfrom model.text_cnn import TextCNN\nfrom trainer.trainer import Trainer\nfrom utils.logger import Logger\nfrom utils.config import parse_arguments\n\nif __name__ == '__main__':\n    args = parse_arguments()\n    device = torch.device('cuda' if args.gpu and torch.cuda.is_available() else 'cpu')\n\n    tokenizer = Tokenizer().load_tokenizer()\n    data_loader = DataLoader(args.batch_size, args.max_length)\n    dataset = data_loader.load_data()\n    train_dataloader, val_dataloader, _ = data_loader.preprocess_data(dataset, tokenizer)\n\n    model = TextCNN(args.embedding_dim, args.kernel_sizes, args.max_length)\n    trainer = Trainer(model, args.learning_rate, args.batch_size, args.num_epochs, device)\n    logger = Logger(args.train_log_per_k_batch)\n\n    trainer.train(train_dataloader, val_dataloader, logger, args.save_every_n_epoch, args.output_dir)\n",
+            "scripts/test.py": "import torch\nfrom data.data_loader import DataLoader\nfrom data.tokenizer import Tokenizer\nfrom model.text_cnn import TextCNN\nfrom trainer.trainer import Trainer\nfrom utils.logger import Logger\nfrom utils.config import parse_arguments\n\nif __name__ == '__main__':\n    args = parse_arguments()\n    device = torch.device('cuda' if args.gpu and torch.cuda.is_available() else 'cpu')\n\n    tokenizer = Tokenizer().load_tokenizer()\n    data_loader = DataLoader(args.batch_size, args.max_length)\n    dataset = data_loader.load_data()\n    _, _, test_dataloader = data_loader.preprocess_data(dataset, tokenizer)\n\n    model = TextCNN(args.embedding_dim, args.kernel_sizes, args.max_length)\n    model.load_state_dict(torch.load(f'{args.output_dir}/best_model.pth'))\n    model.to(device)\n\n    trainer = Trainer(model, args.learning_rate, args.batch_size, args.num_epochs, device)\n    logger = Logger(args.train_log_per_k_batch)\n\n    test_accuracy = trainer.evaluate(test_dataloader)\n    logger.log_final_accuracy(test_accuracy)\n",
+            "outputs/checkpoints/": "",
+            "README.md": "# TextCNN Sentiment Analysis\n\nThis project implements a TextCNN model for sentiment classification on the IMDb dataset using PyTorch. The model is trained to classify movie reviews as positive or negative.\n\n## Requirements\n\nTo install the required packages, run:\n\n```\npip install -r requirements.txt\n```\n\n## Usage\n\n### Training\n\nTo train the model, use the following command:\n\n```\npython scripts/train.py --output_dir './outputs'\n```\n\n### Testing\n\nTo test a trained model, use the following command:\n\n```\npython scripts/test.py --output_dir './outputs'\n```\n\n## Project Structure\n\n- `data/`: Contains data loading and tokenization scripts.\n- `model/`: Contains the TextCNN model implementation.\n- `trainer/`: Contains the training and evaluation logic.\n- `utils/`: Contains utility scripts for logging and configuration.\n- `scripts/`: Contains scripts for training and testing the model.\n- `outputs/`: Directory for saving model checkpoints and outputs.\n"
+        }
+    }
+    ```
+  acceptance_tests: |-
+    import unittest
+    import subprocess
+    import os
+
+    class TestTextCNNAcceptance(unittest.TestCase):
+        
+        def setUp(self):
+            """Set up the environment for testing"""
+            self.output_dir = './outputs'
+            if not os.path.exists(self.output_dir):
+                os.makedirs(self.output_dir)
+
+        def test_training_mode(self):
+            """Test the training mode of the TextCNN model"""
+            # Run the training script
+            result = subprocess.run([
+                'python', 'main.py',
+                '--learning_rate', '0.01',
+                '--num_epochs', '10',
+                '--batch_size', '16',
+                '--embedding_dim', '300',
+                '--kernel_sizes', '3', '4', '5',
+                '--max_length', '50',
+                '--save_every_n_epoch', '2',
+                '--train',
+                '--gpu',
+                '--output_dir', self.output_dir,
+                '--train_log_per_k_batch', '20',
+                '--random_seed', '20'
+            ], capture_output=True, text=True)
+
+            # Check if the training loss decreases and accuracy is above 0.6
+            self.assertIn('Training loss decreased', result.stdout)
+            self.assertIn('Evaluation accuracy: ', result.stdout)
+            accuracy_line = [line for line in result.stdout.split('\n') if 'Evaluation accuracy: ' in line]
+            if accuracy_line:
+                accuracy = float(accuracy_line[0].split(': ')[1])
+                self.assertGreater(accuracy, 0.6)
+
+        def test_testing_mode(self):
+            """Test the testing mode of the TextCNN model"""
+            # Run the testing script
+            result = subprocess.run([
+                'python', 'main.py',
+                '--test',
+                '--gpu',
+                '--output_dir', self.output_dir
+            ], capture_output=True, text=True)
+
+            # Check if the test accuracy is above 0.6
+            self.assertIn('Test accuracy: ', result.stdout)
+            accuracy_line = [line for line in result.stdout.split('\n') if 'Test accuracy: ' in line]
+            if accuracy_line:
+                accuracy = float(accuracy_line[0].split(': ')[1])
+                self.assertGreater(accuracy, 0.6)
+
+    if __name__ == '__main__':
+        unittest.main()
+  unit_tests: |-
+    import unittest
+    from model.text_cnn import TextCNN
+    from data.data_loader import DataLoader
+    from trainer.trainer import Trainer
+    from utils.logger import Logger
+    from utils.config import Config
+    from transformers import BertTokenizer
+    import torch
+    import os
+
+    class TestTextCNN(unittest.TestCase):
+        def setUp(self):
+            self.config = Config()
+            self.config.parse_arguments(['--learning_rate', '0.01', '--num_epochs', '2', '--batch_size', '16', '--embedding_dim', '300', '--kernel_sizes', '3', '4', '5', '--max_length', '50', '--save_every_n_epoch', '1', '--train', '--output_dir', './outputs', '--train_log_per_k_batch', '20', '--random_seed', '20'])
+            self.data_loader = DataLoader()
+            self.data_loader.load_data()
+            self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+            self.data_loader.preprocess_data(self.tokenizer)
+            self.text_cnn = TextCNN(embedding_dim=self.config.embedding_dim, kernel_sizes=self.config.kernel_sizes, max_length=self.config.max_length)
+            self.trainer = Trainer(learning_rate=self.config.learning_rate, batch_size=self.config.batch_size, num_epochs=self.config.num_epochs)
+            self.logger = Logger()
+
+        def test_text_cnn_structure(self):
+            self.assertEqual(self.text_cnn.embedding_dim, 300)
+            self.assertEqual(self.text_cnn.kernel_sizes, [3, 4, 5])
+            self.assertEqual(self.text_cnn.max_length, 50)
+
+        def test_training_process(self):
+            self.trainer.train(self.text_cnn, self.data_loader, self.logger)
+            # Check if the model checkpoint is saved
+            self.assertTrue(os.path.exists('./outputs/checkpoints'))
+
+        def test_logging(self):
+            # Assuming logger logs to a file or a list, check if logs are created
+            self.trainer.train(self.text_cnn, self.data_loader, self.logger)
+            # Check if logs are created (this is a placeholder, actual implementation depends on how Logger is implemented)
+            self.assertTrue(self.logger.has_logs())
+
+        def test_evaluation_accuracy(self):
+            accuracy = self.trainer.evaluate(self.text_cnn, self.data_loader)
+            self.assertGreaterEqual(accuracy, 0.6)
+
+        def test_reproducibility(self):
+            torch.manual_seed(20)
+            initial_weights = self.text_cnn.state_dict()
+            self.trainer.train(self.text_cnn, self.data_loader, self.logger)
+            final_weights = self.text_cnn.state_dict()
+            # Check if weights have changed after training
+            self.assertNotEqual(initial_weights, final_weights)
+
+    if __name__ == '__main__':
+        unittest.main()

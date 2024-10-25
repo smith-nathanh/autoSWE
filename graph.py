@@ -118,9 +118,9 @@ def implementation(state: GraphState):
                                           architecture_design=state["documents"]["architecture_design"],
                                           requirements=state["documents"]["requirements"])
     structured_llm = llm.with_structured_output(Implementation)
-    code = structured_llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    code = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
     #code = {"file1": "code", "file2": "code"} # temporary response
-    state['documents'].update(code.dict())
+    state['documents'].update({"code": code.content})
     return state
 
 def approve_implementation(state: GraphState):
