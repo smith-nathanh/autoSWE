@@ -213,9 +213,7 @@ architecture_design.md
 
 IMPLEMENTATION_PROMPT = """
 
-Given the inputs I will pass below, follow the file hierarchy in the "architecture_design" and write each script one-at-a-time. 
-
-Add each script you generate to the dictionary with the key as the file name and the value as the script content.
+Given the files I will pass below, follow the file hierarchy in the "architecture_design" and write each script one-at-a-time. 
 
 Here are the input documents for you to reference:
 
@@ -243,14 +241,21 @@ Requirements.txt
 ----------------
 {requirements}
 
+Please ensure your response is a dictionary with the following structure:
+```json
+{{
+    "code": {{
+        "file1": "content of file1",
+        "file2": "content of file2",
+        ...
+    }}
+}}
+```
 """
 
 ACCEPTANCE_TEST_PROMPT = """
 
-Given the inputs, generate appropriate acceptance tests in one file ensuring the software adheres to requirements in the PRD
-The acceptance tests must contain the test input (command to execute) and the expected output.
-
-Return a dictionary with key as "acceptance_tests" and value the string that can be written to a python file. 
+Given the inputs, generate appropriate acceptance tests in one file ensuring the software adheres to requirements in the PRD.
 
 Here are the input documents for you to reference:
 
@@ -278,6 +283,13 @@ Requirements.txt
 ----------------
 {requirements}
 
+
+Please ensure your response is a dictionary with the following structure:
+```json
+{{
+    "acceptance_tests": "content of acceptance test file"
+}}
+```
 """
 
 UNIT_TEST_PROMPT = """
@@ -314,6 +326,12 @@ Requirements.txt
 ----------------
 {requirements}
 
+Please ensure your response is a dictionary with the following structure:
+```json
+{{
+    "unit_tests": "content of unit test file"
+}}
+```
 """
 
 
