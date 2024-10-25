@@ -1,0 +1,11 @@
+prd_paths:
+  - benchmark_data/python/ArXiv_digest/docs/PRD.md
+  - benchmark_data/python/chakin/PRD.md
+  - benchmark_data/python/geotext/PRD.md
+  - benchmark_data/python/hone/docs/PRD.md
+  - benchmark_data/python/Hybrid_Images/docs/PRD.md
+  - benchmark_data/python/lice/PRD.md
+  - benchmark_data/python/particle-swarm-optimization/docs/PRD.md
+  - benchmark_data/python/readtime/docs/PRD.md
+  - benchmark_data/python/stocktrends/docs/PRD.md
+  - benchmark_data/python/TextCNN/PRD.md
