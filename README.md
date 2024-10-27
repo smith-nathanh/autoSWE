@@ -35,12 +35,12 @@ You will need to make an account at [Langchain](https://langchain.com).
 
 To point at a specific PRD.md file and run the full program:
 ```python
-python main.py --prd_path path/to/PRD.md
+python main.py --prd_path path/to/PRD.md --out_path outputs/name_of_repo.json
 ```
 
 Alternatively, you can run the example PRD.md file in the repo:
 
 ```python
-python main.py
+python main.py --out_path outputs/sample.json
 ```
 
