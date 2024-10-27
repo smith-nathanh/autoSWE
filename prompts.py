@@ -183,7 +183,7 @@ architecture_design.md
 {architecture_design}
 """
 
-REQUIREMENTS_PROMPT = """
+ENVIRONMENT_SETUP_PROMPT = """
 
 Generate a requirements.txt pip-style to satisfy all the expected dependencies and include unittest as a requirement.
 Return a dictionary with key "requirements" and value should be a string that can be written to a file named requirements.txt

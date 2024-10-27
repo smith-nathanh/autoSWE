@@ -7,16 +7,17 @@ from prompts import *
 from langchain_core.messages import HumanMessage
 import logging
 from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
 
 # need to find better place for this
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
+#llm = ChatAnthropic(model_name='claude-3-5-sonnet-20241022', temperature=0)
 
 # Define the state of our graph
 class GraphState(TypedDict):
     """
     Represents the state of our graph.
     """
-    prompt: str
     messages: List[str]
     approvals: Dict[str, bool]
     documents: Dict[str, Union[str, Document, Dict[str, str]]]
@@ -27,7 +28,7 @@ class Design(BaseModel):
     UML_sequence: str = Field(description="UML sequence diagram using mermaid syntax")
     architecture_design: str = Field(description="architecture design as a text based representation of the file tree")
 
-class Requirements(BaseModel):
+class EnvironmentSetup(BaseModel):
     requirements: str = Field(description="All the expected dependencies that can be written to a file named requirements.txt")
 
 class Implementation(BaseModel):
@@ -62,37 +63,37 @@ def approve_software_design(state: GraphState):
     state['messages'] = ["UML class diagram approved"] # llm reponse message
     return state
 
-def route_software_design(state: GraphState) -> Literal['requirements', 'software_design']:
+def route_software_design(state: GraphState) -> Literal['environment_setup', 'software_design']:
     if all(state["approvals"].values()):
-        return "requirements"
+        return "environment_setup"
     else:
         return "software_design"
 
-def requirements(state: GraphState):
+def environment_setup(state: GraphState):
     """
     Based on the design documents, determine the requirements.txt file.
     """
-    logging.info("---REQUIREMENTS---")
-    prompt = REQUIREMENTS_PROMPT.format(**state["documents"])
-    structured_llm = llm.with_structured_output(Requirements)
+    logging.info("---environment_setup---")
+    prompt = ENVIRONMENT_SETUP_PROMPT.format(**state["documents"])
+    structured_llm = llm.with_structured_output(EnvironmentSetup)
     reqs = structured_llm.invoke([HumanMessage(content=prompt)])
     state["documents"].update(reqs.dict())
     return state
 
-def approve_requirements(state: GraphState):
+def approve_environment_setup(state: GraphState):
     """
     Test the requirements.txt file.
     """
-    logging.info("------APPROVE REQUIREMENTS---")
+    logging.info("------APPROVE ENVIRONMENT SETUP---")
     # need a shell to run the requirements.txt file and see if it works
     state['approvals'].update({"requirements": True})
     return state
 
-def route_requirements(state: GraphState) -> Literal['implementation', 'requirements']:
+def route_environment_setup(state: GraphState) -> Literal['implementation', 'environment_setup']:
     if all(state["approvals"].values()):
         return "implementation"
     else:
-        return "requirements"
+        return "environment_setup"
 
 def implementation(state: GraphState):
     """
@@ -180,8 +181,8 @@ def build_graph():
     # nodes
     graph.add_node("software_design", software_design)
     graph.add_node("approve_software_design", approve_software_design)
-    graph.add_node("requirements", requirements)
-    graph.add_node("approve_requirements", approve_requirements)
+    graph.add_node("environment_setup", environment_setup)
+    graph.add_node("approve_environment_setup", approve_environment_setup)
     graph.add_node("implementation", implementation)
     graph.add_node("approve_implementation", approve_implementation)
     graph.add_node("acceptance_tests", acceptance_tests)
@@ -193,8 +194,8 @@ def build_graph():
     graph.add_edge(START, "software_design")
     graph.add_edge("software_design", "approve_software_design")
     graph.add_conditional_edges("approve_software_design", route_software_design)
-    graph.add_edge("requirements", "approve_requirements")
-    graph.add_conditional_edges("approve_requirements", route_requirements)
+    graph.add_edge("environment_setup", "approve_environment_setup")
+    graph.add_conditional_edges("approve_environment_setup", route_environment_setup)
     graph.add_edge("implementation", "approve_implementation")
     graph.add_conditional_edges("approve_implementation", route_implementation)
     graph.add_edge("acceptance_tests", "approve_acceptance_tests")

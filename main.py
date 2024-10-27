@@ -2,10 +2,10 @@ from dotenv import load_dotenv
 import os
 import logging
 from langsmith import utils
-from langchain_openai import ChatOpenAI
 from graph import build_graph
 from prompts import SAMPLE_PRD
 import argparse
+import json
 
 
 # set logging level
@@ -18,6 +18,7 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Run the SWEGraph with a specified PRD.")
     parser.add_argument("--prd_path", type=str, default=None, help="Path to the PRD file")
+    parser.add_argument("--out_path", type=str, default="output.json", help="Path to the output file")
     args = parser.parse_args()
 
     if args.prd_path is None:
@@ -28,7 +29,11 @@ def main():
 
     graph = build_graph()
     graph.get_graph().draw_mermaid_png(output_file_path="images/swegraph.png")
-    graph.invoke({"documents": {'PRD': prd_content}})
+    final_state = graph.invoke({"documents": {'PRD': prd_content}})
+
+    # save the final state to a json file
+    with open(args.out_path, 'w') as file:
+        json.dump(final_state, file, indent=4)
 
 
 if __name__ == "__main__":
