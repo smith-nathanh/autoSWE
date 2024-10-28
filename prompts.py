@@ -92,14 +92,12 @@ Return a dictionary with the following keys:
 """
 
 APPROVE_DESIGN_PROMPT = """
-You are a senior software engineer who doesn't miss a thing. 
+You are an expert software engineer. 
 
-Review the PRD, UML_class, UML_sequence, and architecture_design under the following Evalution Guidance and Faithfullness criteria 
-and judge if they pass or fail. 
+Below is the evaluation criteria I want you to use to evaluate the UML_class diagram, UML_sequence diagram, and architecture_design.
 
-Return a dictionary with the following keys "UML_class", "UML_sequence", "architecture_design" and values as boolean.
-
-Evaluation Guidance for UML Class
+```
+Evaluation Guidance for UML_class
 General Principles
 • Cohesion and Decoupling: The design should aim for high cohesion within individual classes and low coupling
 between different classes. High cohesion ensures that each class is dedicated to a singular task or concept, enhancing
@@ -121,9 +119,9 @@ without making any hallucinations and additions. Ensure that the conceptual clas
 accurately represent the essentials outlined in the PRD. This includes a detailed focus on the associations between
 classes, their cardinalities, and the types of relationships such as inheritance, aggregation, and composition. Clarity
 in class names and the optional inclusion of attributes are key for aligning with the repository's vision.
-
-
-Evaluation Guidance for UML Sequence
+```
+```
+Evaluation Guidance for UML_sequence
 General Principles
 • Uniformity and Integration: The design should demonstrate a consistent style and integrated approach, ensuring all
 components work seamlessly together.
@@ -145,9 +143,9 @@ requirements specified in the PRD. This includes how well it captures system eve
 parameters, and the accuracy with which it reflects the impact of these events on the system's behavior. Also
 Evaluate how accurately and comprehensively the sequence diagram reflects the structural design outlined in the
 given UML class diagrams, ensuring a coherent and consistent development process.
-
-
-Evaluation Guidance for Architecture Design
+```
+```
+Evaluation Guidance for architecture_design
 General Principles
 • Uniformity and Integration: The design should demonstrate a consistent style and integrated approach, ensuring all
 components work seamlessly together, ensuring high cohesion and decoupling.
@@ -164,25 +162,41 @@ Faithfulness
 • The architecture must be in strict accordance with the given PRD and UML class diagrams. It should accurately
 reflect the requirements specified in the PRD and the structural design outlined in the UML diagrams, ensuring a
 coherent and consistent development process.
+```
 
-PRD.md
+Below is the PRD document which is the source of truth for your analysis. 
+
+PRD
 -----------
 {PRD}
 
 
-UML_class.md
+Below are the documents I want you to evaluate:
+
+UML_class
 -----------
 {UML_class}
 
 
-UML_sequence.md
+UML_sequence
 ---------------
 {UML_sequence}
 
 
-architecture_design.md
+architecture_design
 ----------------------
 {architecture_design}
+
+
+Your final response should be a dictionary with keys: 
+- "UML_class" : boolean
+- "UML_sequence" : boolean
+- "architecture_design" : boolean
+- "message" : str
+
+The boolean values should represent your judgement on whether the respective document passes or fails the criteria.
+The message should provide a brief explanation of your decision and in the event you find errors, provide specific feedback 
+on how to correct the mistakes you found. 
 """
 
 ENVIRONMENT_SETUP_PROMPT = """
@@ -252,13 +266,13 @@ APPROVE_IMPLEMENTATION_PROMPT = """
 
 Please verify if the architectural design described in the text representation below:
 
-```plaintext
+```
 {architecture_design}
 ```
 
 is accurately mirrored in the following dictionary structure. The dictionary should have a single primary key, `"code"`, with subsequent keys representing each file detailed in the `architecture_design.md`.
 
-```python
+```
 {code}
 ```
 

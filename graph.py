@@ -2,7 +2,7 @@ from typing import Any, List, Dict, Type, Union, Literal
 from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
 from langchain.schema import Document
-from langgraph.graph import StateGraph, START, END
+from langgraph.graph import StateGraph, START, END, MessagesState
 from prompts import *
 from langchain_core.messages import HumanMessage
 import logging
@@ -20,13 +20,19 @@ class GraphState(TypedDict):
     """
     messages: List[str]
     approvals: Dict[str, bool]
-    documents: Dict[str, Union[str, Document, Dict[str, str]]]
+    documents: Dict[str, Union[str, Dict[str, str]]]
 
 # Defining the models for the structured outputs
 class Design(BaseModel):
     UML_class: str = Field(description="UML class diagram using mermaid syntax")
     UML_sequence: str = Field(description="UML sequence diagram using mermaid syntax")
     architecture_design: str = Field(description="architecture design as a text based representation of the file tree")
+
+class ApproveDesign(BaseModel):
+    UML_class: bool
+    UML_sequence: bool
+    architecture_design: bool
+    message: str
 
 class EnvironmentSetup(BaseModel):
     requirements: str = Field(description="All the expected dependencies that can be written to a file named requirements.txt")
@@ -49,9 +55,12 @@ def software_design(state: GraphState):
     Designs the markdown files for the software design.
     """
     logging.info("---SOFTWARE DESIGN---")
-    design_prompt = DESIGN_PROMPT.format(**state['documents'])
+    prompt = DESIGN_PROMPT.format(**state['documents'])
+    if "approvals" in state:
+        if not all(state['approvals'].values()):
+            prompt += state['messages'][-1] # add the message from the controller
     structured_llm = llm.with_structured_output(Design)
-    response = structured_llm.invoke([HumanMessage(content=design_prompt)])
+    response = structured_llm.invoke([HumanMessage(content=prompt)])
     state["documents"].update(response.dict())
     return state
 
@@ -61,10 +70,13 @@ def approve_software_design(state: GraphState):
     """
     logging.info("---APPROVE SOFTWARE DESIGN---")
     prompt = APPROVE_DESIGN_PROMPT.format(**state['documents'])
-    #approvals = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
+    structured_llm = llm.with_structured_output(ApproveDesign)
+    approval = structured_llm.invoke([HumanMessage(content=prompt)])
     # temporarily using hardcoded values
-    state['approvals'] = {"UML_class": True, "UML_sequence": True, "architecture_design": True}
-    state['messages'] = ["UML class diagram approved"] # llm reponse message
+    state['approvals'] = {"UML_class": approval.UML_class,
+                          "UML_sequence": approval.UML_sequence, 
+                          "architecture_design": approval.architecture_design}
+    state['messages'] = [approval.message]
     return state
 
 def route_software_design(state: GraphState) -> Literal['environment_setup', 'software_design']:
@@ -105,8 +117,9 @@ def implementation(state: GraphState):
     """
     logging.info("---IMPLEMENTATION---")
     prompt = IMPLEMENTATION_PROMPT.format(**state["documents"])
-    if state['approvals'].get('implementation', False):
-        prompt = state['messages'][-1] # add the message from the controller
+    if 'implementation' in state['approvals']:
+        if not state['approvals']['implementation']:
+            prompt += state['messages'][-1] # add the message from the controller
     structured_llm = llm.with_structured_output(Implementation)
     code = structured_llm.invoke([HumanMessage(content=prompt)])
     state['documents'].update(code.dict())
