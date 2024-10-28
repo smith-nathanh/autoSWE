@@ -34,6 +34,10 @@ class EnvironmentSetup(BaseModel):
 class Implementation(BaseModel):
     code: Dict[str, str]
 
+class ApproveImplementation(BaseModel):
+    implementation: bool
+    message: str
+
 class AcceptanceTests(BaseModel):
     acceptance_tests: str = Field(description="Acceptance test script for the software")
 
@@ -55,7 +59,7 @@ def approve_software_design(state: GraphState):
     """
     LLM-as-a-judge to review the design documents.
     """
-    logging.info("------APPROVE SOFTWARE DESIGN---")
+    logging.info("---APPROVE SOFTWARE DESIGN---")
     prompt = APPROVE_DESIGN_PROMPT.format(**state['documents'])
     #approvals = llm.invoke([HumanMessage(content=prompt)]) # use structured outputs here
     # temporarily using hardcoded values
@@ -73,7 +77,7 @@ def environment_setup(state: GraphState):
     """
     Based on the design documents, determine the requirements.txt file.
     """
-    logging.info("---environment_setup---")
+    logging.info("---ENVIRONMENT SETUP---")
     prompt = ENVIRONMENT_SETUP_PROMPT.format(**state["documents"])
     structured_llm = llm.with_structured_output(EnvironmentSetup)
     reqs = structured_llm.invoke([HumanMessage(content=prompt)])
@@ -84,7 +88,7 @@ def approve_environment_setup(state: GraphState):
     """
     Test the requirements.txt file.
     """
-    logging.info("------APPROVE ENVIRONMENT SETUP---")
+    logging.info("---APPROVE ENVIRONMENT SETUP---")
     # need a shell to run the requirements.txt file and see if it works
     state['approvals'].update({"requirements": True})
     return state
@@ -101,18 +105,21 @@ def implementation(state: GraphState):
     """
     logging.info("---IMPLEMENTATION---")
     prompt = IMPLEMENTATION_PROMPT.format(**state["documents"])
+    if state['approvals'].get('implementation', False):
+        prompt = state['messages'][-1] # add the message from the controller
     structured_llm = llm.with_structured_output(Implementation)
     code = structured_llm.invoke([HumanMessage(content=prompt)])
     state['documents'].update(code.dict())
     return state
 
 def approve_implementation(state: GraphState):
-    logging.info("------APPROVE IMPLEMENTATION---")
-    # need a shell to run the code and see if it works
-    # run pylint on the code
-    # temporary response below
-    state['approvals'].update({"implementation": True})
-    state['messages'].append("Code approved") # llm response message
+    logging.info("---APPROVE IMPLEMENTATION---")
+    prompt = APPROVE_IMPLEMENTATION_PROMPT.format(architecture_design=state["documents"]['architecture_design'],
+                                                  code=state["documents"]['code'].keys())
+    structured_llm = llm.with_structured_output(ApproveImplementation)
+    approval = structured_llm.invoke([HumanMessage(content=prompt)])
+    state['approvals'].update({"implementation": approval.implementation})
+    state['messages'].append(approval.message)
     return state
 
 def route_implementation(state: GraphState) -> Literal['acceptance_tests', 'implementation']:
@@ -133,7 +140,7 @@ def acceptance_tests(state: GraphState):
     return state
 
 def approve_acceptance_tests(state: GraphState):
-    logging.info("------APPROVE ACCEPTANCE TESTS---")
+    logging.info("---APPROVE ACCEPTANCE TESTS---")
     # need a shell to run the acceptance tests and see if they pass
     # temporary response below
     state['approvals'].update({"acceptance_tests": True})
@@ -161,7 +168,7 @@ def unit_tests(state: GraphState):
     return state
 
 def approve_unit_tests(state: GraphState):
-    logging.info("------APPROVE UNIT TESTS---")
+    logging.info("---APPROVE UNIT TESTS---")
     # need a shell to run the unit tests and see if they pass
     # temporary response below
     state['approvals'].update({"unit_tests": True})

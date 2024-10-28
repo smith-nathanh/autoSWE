@@ -1,5 +1,7 @@
 
-# we actually want to set these up as structured outputs, but for now we will prompt this way
+# using structured outputs
+# having trouble getting implementation prompt to work with anthropic model
+# need to refine these prompts in general
 
 SAMPLE_PRD = """
 # Introduction
@@ -245,6 +247,32 @@ Please ensure your response is a dictionary with one key "code" whose value
 is another dictionary where there is a key for each file in the architecture_design.md file and the value should be the content of the file.
 """
 
+
+APPROVE_IMPLEMENTATION_PROMPT = """
+
+Please verify if the architectural design described in the text representation below:
+
+```plaintext
+{architecture_design}
+```
+
+is accurately mirrored in the following dictionary structure. The dictionary should have a single primary key, `"code"`, with subsequent keys representing each file detailed in the `architecture_design.md`.
+
+```python
+{code}
+```
+
+Your task is to return a dictionary with two keys:
+- `"approved"`: A boolean indicating whether the hierarchical mapping is correct.
+- `"message"`: A descriptive confirmation message. If the structure is incorrect, please write a message explaining what 
+was incorrect and how it should be fixed. Your message will be used to guide another LLM in correcting the structure.
+
+
+Your analysis and response will help ensure consistency and correctness between the architectural design and its representation in code.
+"""
+
+
+
 ACCEPTANCE_TEST_PROMPT = """
 
 Given the inputs, generate appropriate acceptance tests in one file ensuring the software adheres to requirements in the PRD.
@@ -325,7 +353,4 @@ Please ensure your response is a dictionary with the following structure:
 }}
 ```
 """
-
-
-
 
