@@ -2,8 +2,9 @@ from dotenv import load_dotenv
 import os
 import logging
 from langsmith import utils
+from langchain_core.messages import HumanMessage
 from graph import build_graph
-from prompts import SAMPLE_PRD
+from prompts import SAMPLE_PRD, DESIGN_PROMPT
 import argparse
 import json
 
@@ -29,11 +30,14 @@ def main():
 
     graph = build_graph()
     graph.get_graph().draw_mermaid_png(output_file_path="images/swegraph.png")
-    final_state = graph.invoke({"documents": {'PRD': prd_content}})
+    state = {'documents': {'PRD': prd_content},
+             'messages': [HumanMessage(content=DESIGN_PROMPT.format(PRD=prd_content))]}
+    final_state = graph.invoke(state)
+    print(final_state)
 
     # save the final state to a json file
-    with open(args.out_path, 'w') as file:
-        json.dump(final_state, file, indent=4)
+    #with open(args.out_path, 'w') as file:
+    #    json.dump(final_state, file, indent=4)
 
 
 if __name__ == "__main__":

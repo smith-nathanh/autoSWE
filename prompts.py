@@ -196,7 +196,7 @@ Your final response should be a dictionary with keys:
 
 The boolean values should represent your judgement on whether the respective document passes or fails the criteria.
 The message should provide a brief explanation of your decision and in the event you find errors, provide specific feedback 
-on how to correct the mistakes you found. 
+on how to correct the mistakes you found.
 """
 
 ENVIRONMENT_SETUP_PROMPT = """
@@ -270,7 +270,7 @@ Please verify if the architectural design described in the text representation b
 {architecture_design}
 ```
 
-is accurately mirrored in the following dictionary structure. The dictionary should have a single primary key, `"code"`, with subsequent keys representing each file detailed in the `architecture_design.md`.
+is accurately mirrored in the documents below. There should be one key for each file in the architecture design.
 
 ```
 {code}
@@ -278,14 +278,12 @@ is accurately mirrored in the following dictionary structure. The dictionary sho
 
 Your task is to return a dictionary with two keys:
 - `"approved"`: A boolean indicating whether the hierarchical mapping is correct.
-- `"message"`: A descriptive confirmation message. If the structure is incorrect, please write a message explaining what 
-was incorrect and how it should be fixed. Your message will be used to guide another LLM in correcting the structure.
+- `"message"`: A descriptive confirmation message. If the document names do not agree with the architecture_design
+(which is the source of truth) write a prompt instructing a downstream LLM to remove the additional file.
 
-
-Your analysis and response will help ensure consistency and correctness between the architectural design and its representation in code.
+Your analysis and response will help ensure consistency and correctness between the architecture_design 
+and its representation in code.
 """
-
-
 
 ACCEPTANCE_TEST_PROMPT = """
 
