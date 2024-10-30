@@ -59,6 +59,11 @@ class UpdateDocument(BaseModel):
 
 # want the agent to be able to edit only one document at a time, don't want a regeneration from that node again
 # so we use an assistant that has access to tools to fix documents based on feedback from the reviewer
+# environment setup agent will have to update it's reqs once it's done with implementation 
+# or if there were any additional issues encountered during implementation/execution of code
+
+# *** we need a subgraph to rerun acceptance and unit tests after a change has been made to the implementation
+
 
 @tool
 def view_document(document_name: str, state: Annotated[dict, InjectedState]) -> str:
@@ -197,11 +202,9 @@ def software_design(state: GraphState):
     logging.info("---SOFTWARE DESIGN---")
     #prompt = DESIGN_PROMPT.format(**state['documents'])
     # state["messages"] = [HumanMessage(content=DESIGN_PROMPT.format(**state['documents']))]
-    # if "approvals" in state:
-    #     if not all(state['approvals'].values()): # this implies that we are back at this node after a rejection
-    #         llm_with_tools = llm.bind_tools([view_document, update_document, add_document, delete_document])
-    #         state['messages'] = [llm_with_tools.invoke([sys_message] + [state['messages'][-1]])]
-    #         return state
+    if "approvals" in state:
+        if not all(state['approvals'].values()): # this implies that we are back at this node after a rejection
+            assistant(state)
     structured_llm = llm.with_structured_output(Design)
     response = structured_llm.invoke(state['messages']) #[HumanMessage(content=prompt)])
     state["documents"].update(response.dict())
@@ -222,11 +225,11 @@ def approve_software_design(state: GraphState):
     state['messages'].append(approval.message)
     return state
 
-def route_software_design(state: GraphState) -> Literal['environment_setup', 'assistant']:
+def route_software_design(state: GraphState) -> Literal['implementation', 'software_design']:
     if all(state["approvals"].values()):
-        return "environment_setup"
+        return "implementation"
     else:
-        return "assistant"
+        return "software_design"
 
 def environment_setup(state: GraphState):
     """
@@ -239,18 +242,18 @@ def environment_setup(state: GraphState):
     state["documents"].update(reqs.dict())
     return state
 
-def approve_environment_setup(state: GraphState):
-    """
-    Test the requirements.txt file.
-    """
-    logging.info("---APPROVE ENVIRONMENT SETUP---")
-    # need a shell to run the requirements.txt file and see if it works
-    state['approvals'].update({"requirements": True})
-    return state
+# def approve_environment_setup(state: GraphState):
+#     """
+#     Test the requirements.txt file.
+#     """
+#     logging.info("---APPROVE ENVIRONMENT SETUP---")
+#     # need a shell to run the requirements.txt file and see if it works
+#     state['approvals'].update({"requirements": True})
+#     return state
 
-def route_environment_setup(state: GraphState) -> Literal['implementation', 'environment_setup']:
+def route_environment_setup(state: GraphState) -> Literal['approve_acceptance_tests', 'environment_setup']:
     if all(state["approvals"].values()):
-        return "implementation"
+        return "approve_acceptance_tests"
     else:
         return "environment_setup"
 
@@ -259,13 +262,13 @@ def implementation(state: GraphState):
     Implement the software design.
     """
     logging.info("---IMPLEMENTATION---")
-    prompt = IMPLEMENTATION_PROMPT.format(**state["documents"])
+    prompt = [HumanMessage(content=IMPLEMENTATION_PROMPT.format(**state["documents"]))]
     if 'implementation' in state['approvals']:
         if not state['approvals']['implementation']:
-            prompt += state['messages'][-1] # add the message from the controller
+            prompt.append(state['messages'][-1]) # add the message from the controller
     structured_llm = llm.with_structured_output(Implementation)
-    state["messages"].append(HumanMessage(content=prompt))
-    code = structured_llm.invoke([HumanMessage(content=prompt)])
+    code = structured_llm.invoke(prompt)
+    state["messages"].append(prompt)
     state['documents'].update(code.dict())
     return state
 
@@ -280,11 +283,11 @@ def approve_implementation(state: GraphState):
     state['messages'].append(AIMessage(content=approval.message))
     return state
 
-def route_implementation(state: GraphState) -> Literal['acceptance_tests', 'assistant']:
+def route_implementation(state: GraphState) -> Literal['acceptance_tests', 'implementation']:
     if all(state["approvals"].values()):
         return "acceptance_tests"
     else:
-        return "assistant"
+        return "implementation"
 
 def acceptance_tests(state: GraphState):
     """
@@ -305,11 +308,11 @@ def approve_acceptance_tests(state: GraphState):
     state['messages'].append("Acceptance tests passed") # llm response message
     return state
 
-def route_acceptance_tests(state: GraphState) -> Literal['unit_tests', 'implementation']:
+def route_acceptance_tests(state: GraphState) -> Literal['approve_unit_tests', 'assistant']:
     if all(state["approvals"].values()):
-        return "unit_tests"
+        return "approve_unit_tests"
     else:
-        return "implementation" # go back to implementation with a message from the controller
+        return "assistant" # go back to implementation with a message from the controller
 
 def unit_tests(state: GraphState):
     """
@@ -333,23 +336,23 @@ def approve_unit_tests(state: GraphState):
     state['messages'].append("Unit tests passed") # llm response message
     return state
 
-def route_unit_tests(state: GraphState) -> Literal["__end__", 'implementation']:
+def route_unit_tests(state: GraphState) -> Literal["__end__", 'assistant']:
     if all(state["approvals"].values()):
         return END
     else:
-        return "implementation" # go back to implementation with a message from the controller
+        return "assistant" # go back to implementation with a message from the controller
 
 def build_graph():
 
     graph = StateGraph(GraphState)
 
     # nodes
-    graph.add_node('tools', ToolNode([view_document, update_document, add_document, delete_document]))
-    graph.add_node("assistant", assistant)
+    #graph.add_node('tools', ToolNode([view_document, update_document, add_document, delete_document]))
+    #graph.add_node("assistant", assistant)
     graph.add_node("software_design", software_design)
     graph.add_node("approve_software_design", approve_software_design)
     graph.add_node("environment_setup", environment_setup)
-    graph.add_node("approve_environment_setup", approve_environment_setup)
+    #graph.add_node("approve_environment_setup", approve_environment_setup)
     graph.add_node("implementation", implementation)
     graph.add_node("approve_implementation", approve_implementation)
     graph.add_node("acceptance_tests", acceptance_tests)
@@ -362,14 +365,27 @@ def build_graph():
     graph.add_edge("software_design", "approve_software_design")
     graph.add_conditional_edges("approve_software_design", route_software_design)
     #graph.add_conditional_edges("assistant", software_design_condition)
-    graph.add_edge("environment_setup", "approve_environment_setup")
-    graph.add_conditional_edges("approve_environment_setup", route_environment_setup)
+    #graph.add_edge("environment_setup", "approve_environment_setup")
+    #graph.add_edge("environment_setup", "implementation")
+    #graph.add_conditional_edges("approve_environment_setup", route_environment_setup)
+    #graph.add_edge("environment_setup", "implementation")
     graph.add_edge("implementation", "approve_implementation")
     graph.add_conditional_edges("approve_implementation", route_implementation)
-    graph.add_conditional_edges("assistant", implementation_condition)
-    graph.add_edge("acceptance_tests", "approve_acceptance_tests")
-    graph.add_conditional_edges("approve_acceptance_tests", route_acceptance_tests)
-    graph.add_edge("unit_tests", "approve_unit_tests")
-    graph.add_conditional_edges("approve_unit_tests", route_unit_tests)
+    #graph.add_conditional_edges("assistant", implementation_condition)
+    #graph.add_edge("acceptance_tests", ""approve_acceptance_tests"")
+    #graph.add_conditional_edges("approve_acceptance_tests", route_acceptance_tests)
+    graph.add_edge("acceptance_tests", "unit_tests")
+    graph.add_edge('unit_tests', "environment_setup")
+    graph.add_edge("environment_setup", "approve_acceptance_tests")
+    graph.add_edge("approve_acceptance_tests", "approve_unit_tests")
+    graph.add_edge("approve_unit_tests", END)
+    #graph.add_edge("environment_setup", "approve_acceptance_tests")
+    #graph.add_conditional_edges("environment_setup", route_environment_setup)
+    #graph.add_conditional_edges("approve_acceptance_tests", route_acceptance_tests)
+    #graph.add_edge("approve_acceptance_tests", "approve_unit_tests")
+    #graph.add_conditional_edges("approve_unit_tests", route_unit_tests)
+    #graph.add_edge('approve_unit_tests', END)
+    #graph.add_edge("unit_tests", "approve_unit_tests")
+    #graph.add_conditional_edges("approve_unit_tests", route_unit_tests)
 
     return graph.compile()

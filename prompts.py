@@ -253,10 +253,6 @@ architecture_design.md
 {architecture_design}
 
 
-Requirements.txt
-----------------
-{requirements}
-
 Please ensure your response is a dictionary with one key "code" whose value 
 is another dictionary where there is a key for each file in the architecture_design.md file and the value should be the content of the file.
 """
@@ -311,11 +307,6 @@ architecture_design.md
 {architecture_design}
 
 
-Requirements.txt
-----------------
-{requirements}
-
-
 Please ensure your response is a dictionary with the following structure:
 ```json
 {{
@@ -353,10 +344,6 @@ architecture_design.md
 ----------------------
 {architecture_design}
 
-
-Requirements.txt
-----------------
-{requirements}
 
 Please ensure your response is a dictionary with the following structure:
 ```json
