@@ -13,6 +13,10 @@ from langgraph.prebuilt import InjectedState, ToolNode, ToolExecutor, tools_cond
 from langchain_core.prompts import ChatPromptTemplate
 
 
+# set logging level
+logging.basicConfig(level=logging.INFO)
+
+
 # need to find better place for this, I believe this can be specified in a config
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
 #llm = ChatAnthropic(model_name='claude-3-5-sonnet-20241022', temperature=0)
@@ -49,10 +53,10 @@ class ApproveImplementation(BaseModel):
     message: str
 
 class AcceptanceTests(BaseModel):
-    acceptance_tests: str = Field(description="Acceptance test script for the software")
+    acceptance_tests: Dict[str, str]
 
 class UnitTests(BaseModel):
-    unit_tests: str = Field(description="Unit test script for the software")
+    unit_tests: Dict[str, str]
 
 class UpdateDocument(BaseModel):
     content: str
@@ -236,7 +240,8 @@ def environment_setup(state: GraphState):
     Based on the design documents, determine the requirements.txt file.
     """
     logging.info("---ENVIRONMENT SETUP---")
-    prompt = ENVIRONMENT_SETUP_PROMPT.format(**state["documents"])
+    code = '\n'.join(state['documents']['code'].values())
+    prompt = ENVIRONMENT_SETUP_PROMPT.format(code=code)
     structured_llm = llm.with_structured_output(EnvironmentSetup)
     reqs = structured_llm.invoke([HumanMessage(content=prompt)])
     state["documents"].update(reqs.dict())
@@ -304,6 +309,7 @@ def approve_acceptance_tests(state: GraphState):
     logging.info("---APPROVE ACCEPTANCE TESTS---")
     # need a shell to run the acceptance tests and see if they pass
     # temporary response below
+    state['messages'].append(state['documents']['acceptance_tests']['command'])
     state['approvals'].update({"acceptance_tests": True})
     state['messages'].append("Acceptance tests passed") # llm response message
     return state
@@ -332,6 +338,7 @@ def approve_unit_tests(state: GraphState):
     logging.info("---APPROVE UNIT TESTS---")
     # need a shell to run the unit tests and see if they pass
     # temporary response below
+    state['messages'].append(state['documents']['unit_tests']['command'])
     state['approvals'].update({"unit_tests": True})
     state['messages'].append("Unit tests passed") # llm response message
     return state

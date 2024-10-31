@@ -204,26 +204,8 @@ ENVIRONMENT_SETUP_PROMPT = """
 Generate a requirements.txt pip-style to satisfy all the expected dependencies and include unittest as a requirement.
 Return a dictionary with key "requirements" and value should be a string that can be written to a file named requirements.txt
 
-Here are the input documents for you to reference:
-
-PRD.md
------------
-{PRD}
-
-
-UML_class.md
------------
-{UML_class}
-
-
-UML_sequence.md
----------------
-{UML_sequence}
-
-
-architecture_design.md
-----------------------
-{architecture_design}
+Here is the code to consider:
+{code}
 """
 
 
@@ -253,8 +235,8 @@ architecture_design.md
 {architecture_design}
 
 
-Please ensure your response is a dictionary with one key "code" whose value 
-is another dictionary where there is a key for each file in the architecture_design.md file and the value should be the content of the file.
+Write each file to a dictionary with the filename as the key and the content as the value.
+Nest all the files in a dictionary with the key "code" and return this nested dictionary.
 """
 
 
@@ -275,7 +257,7 @@ is accurately mirrored in the documents below. There should be one key for each 
 Your task is to return a dictionary with two keys:
 - `"approved"`: A boolean indicating whether the hierarchical mapping is correct.
 - `"message"`: A descriptive confirmation message. If the document names do not agree with the architecture_design
-(which is the source of truth) write a prompt instructing a downstream LLM to remove the additional file.
+(which is the source of truth) write a prompt instructing what the discrepancy is.
 
 Your analysis and response will help ensure consistency and correctness between the architecture_design 
 and its representation in code.
@@ -291,65 +273,55 @@ PRD.md
 -----------
 {PRD}
 
-
 UML_class.md
 -----------
 {UML_class}
-
 
 UML_sequence.md
 ---------------
 {UML_sequence}
 
-
 architecture_design.md
 ----------------------
 {architecture_design}
 
-
-Please ensure your response is a dictionary with the following structure:
-```json
-{{
-    "acceptance_tests": "content of acceptance test file"
-}}
-```
+Write the content of the acceptance test to a dictionary where the key is the filename and the value is the content of the acceptance test..
+Make another key in this dictionary called "command" and write the command to run the acceptance test(s).
+Nest this dictionary in another dictionary with the key "acceptance_tests" and return this nested dictionary.
 """
 
 UNIT_TEST_PROMPT = """
-
-Given the inputs I will pass below, generate appropriate unit tests ensuring the software adheres to requirements in the PRD. 
+Generate unit tests to ensure the software adheres to the requirements in the PRD. 
 
 Pay special attention to the UML class diagram and the architecture design.
 
-Return a dictionary with key as "unit_test" and value the string that can be written to a python file.
-
-Here are the input documents for you to reference:
+Here are the input documents for reference:
 
 PRD.md
 -----------
 {PRD}
 
-
 UML_class.md
 -----------
 {UML_class}
-
 
 UML_sequence.md
 ---------------
 {UML_sequence}
 
-
 architecture_design.md
 ----------------------
 {architecture_design}
 
-
-Please ensure your response is a dictionary with the following structure:
-```json
-{{
-    "unit_tests": "content of unit test file"
-}}
-```
+Write the content of the unit tests to a dictionary where the key is the filename and the value is the content of the acceptance test..
+Make another key in this dictionary called "command" and write the command to run the unit test(s).
+Nest this dictionary in another dictionary with the key "unit_tests" and return this nested dictionary.
 """
 
+
+APPROVE_ACCEPTANCE_TESTS_PROMPT = """
+Generate a command to run the acceptance tests and verify that the software adheres to the requirements in the PRD.
+
+Here is the acceptance test file you will run:
+{acceptance_tests}
+"""
