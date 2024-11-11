@@ -11,6 +11,8 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.tools import tool
 from langgraph.prebuilt import InjectedState, ToolNode, ToolExecutor, tools_condition
 from langchain_core.prompts import ChatPromptTemplate
+import subprocess
+from utils import check_and_install_packages, create_repository
 
 
 # set logging level
@@ -120,6 +122,49 @@ def delete_document(document_name: str, state: Annotated[dict, InjectedState]) -
             return state
     del state["documents"][document_name]
     return state
+
+
+@tool
+def bash(command: str, state: Annotated[dict, InjectedState]) -> str:
+    """
+   "Run commands in a bash shell\n
+    * When invoking this tool, the contents of the \"command\" parameter does NOT need to be XML-escaped.\n
+    * You don't have access to the internet via this tool.\n
+    * You do have access to a mirror of common linux and python packages via apt and pip.\n
+    * State is persistent across command calls and discussions with the user.\n
+    * To inspect a particular line range of a file, e.g. lines 10-25, try 'sed -n 10,25p /path/to/the/file'.\n
+    * Please avoid commands that may produce a very large amount of output.\n
+    * Please run long lived commands in the background, e.g. 'sleep 10 &' or start a server in the background.",
+    """
+    import subprocess
+    try:
+        output = subprocess.check_output(command, shell=True)
+        return output
+    except subprocess.CalledProcessError as e:
+        return e.output
+
+# This is from https://www.anthropic.com/research/swe-bench-sonnet 
+# {
+#    "name": "bash",
+#    "description": "Run commands in a bash shell\n
+# * When invoking this tool, the contents of the \"command\" parameter does NOT need to be XML-escaped.\n
+# * You don't have access to the internet via this tool.\n
+# * You do have access to a mirror of common linux and python packages via apt and pip.\n
+# * State is persistent across command calls and discussions with the user.\n
+# * To inspect a particular line range of a file, e.g. lines 10-25, try 'sed -n 10,25p /path/to/the/file'.\n
+# * Please avoid commands that may produce a very large amount of output.\n
+# * Please run long lived commands in the background, e.g. 'sleep 10 &' or start a server in the background.",
+#    "input_schema": {
+#        "type": "object",
+#        "properties": {
+#            "command": {
+#                "type": "string",
+#                "description": "The bash command to run."
+#            }
+#        },
+#        "required": ["command"]
+#    }
+# }
 
 # update messages at each node
 # let the llm choose to call a tool or to call the respond tool format the respond tool 
@@ -235,33 +280,6 @@ def route_software_design(state: GraphState) -> Literal['implementation', 'softw
     else:
         return "software_design"
 
-def environment_setup(state: GraphState):
-    """
-    Based on the design documents, determine the requirements.txt file.
-    """
-    logging.info("---ENVIRONMENT SETUP---")
-    code = '\n'.join(state['documents']['code'].values())
-    prompt = ENVIRONMENT_SETUP_PROMPT.format(code=code)
-    structured_llm = llm.with_structured_output(EnvironmentSetup)
-    reqs = structured_llm.invoke([HumanMessage(content=prompt)])
-    state["documents"].update(reqs.dict())
-    return state
-
-# def approve_environment_setup(state: GraphState):
-#     """
-#     Test the requirements.txt file.
-#     """
-#     logging.info("---APPROVE ENVIRONMENT SETUP---")
-#     # need a shell to run the requirements.txt file and see if it works
-#     state['approvals'].update({"requirements": True})
-#     return state
-
-def route_environment_setup(state: GraphState) -> Literal['approve_acceptance_tests', 'environment_setup']:
-    if all(state["approvals"].values()):
-        return "approve_acceptance_tests"
-    else:
-        return "environment_setup"
-
 def implementation(state: GraphState):
     """
     Implement the software design.
@@ -307,11 +325,33 @@ def acceptance_tests(state: GraphState):
 
 def approve_acceptance_tests(state: GraphState):
     logging.info("---APPROVE ACCEPTANCE TESTS---")
-    # need a shell to run the acceptance tests and see if they pass
-    # temporary response below
-    state['messages'].append(state['documents']['acceptance_tests']['command'])
-    state['approvals'].update({"acceptance_tests": True})
-    state['messages'].append("Acceptance tests passed") # llm response message
+    
+    try:
+        cmd = f"cd temp && {state['documents']['acceptance_tests']['command']}"
+        # Run command in shell, capture output
+        process = subprocess.run(
+            cmd,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        # Add command to messages
+        state['messages'].append(state['documents']['acceptance_tests']['command'])
+        
+        # Check return code
+        if process.returncode == 0:
+            state['approvals'].update({"acceptance_tests": True})
+            state['messages'].append("Acceptance tests passed")
+        else:
+            state['approvals'].update({"acceptance_tests": False})
+            state['messages'].append(f"Acceptance tests failed: {process.stderr}")
+            
+    except Exception as e:
+        state['approvals'].update({"acceptance_tests": False})
+        state['messages'].append(f"Error running acceptance tests: {str(e)}")
+        
     return state
 
 def route_acceptance_tests(state: GraphState) -> Literal['approve_unit_tests', 'assistant']:
@@ -336,11 +376,33 @@ def unit_tests(state: GraphState):
 
 def approve_unit_tests(state: GraphState):
     logging.info("---APPROVE UNIT TESTS---")
-    # need a shell to run the unit tests and see if they pass
-    # temporary response below
-    state['messages'].append(state['documents']['unit_tests']['command'])
-    state['approvals'].update({"unit_tests": True})
-    state['messages'].append("Unit tests passed") # llm response message
+    
+    try:
+        cmd = f"cd temp && {state['documents']['unit_tests']['command']}"
+        # Run command in shell, capture output
+        process = subprocess.run(
+            cmd,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        # Add command to messages
+        state['messages'].append(state['documents']['unit_tests']['command'])
+        
+        # Check return code
+        if process.returncode == 0:
+            state['approvals'].update({"unit_tests": True})
+            state['messages'].append("Unit tests passed")
+        else:
+            state['approvals'].update({"unit_tests": False})
+            state['messages'].append(f"Acceptance tests failed: {process.stderr}")
+            
+    except Exception as e:
+        state['approvals'].update({"unit_tests": False})
+        state['messages'].append(f"Error running unit tests: {str(e)}")
+        
     return state
 
 def route_unit_tests(state: GraphState) -> Literal["__end__", 'assistant']:
@@ -348,6 +410,61 @@ def route_unit_tests(state: GraphState) -> Literal["__end__", 'assistant']:
         return END
     else:
         return "assistant" # go back to implementation with a message from the controller
+
+def environment_setup(state: GraphState):
+    """
+    Based on the design documents, determine the requirements.txt file.
+    """
+    logging.info("---ENVIRONMENT SETUP---")
+    code = '\n'.join(state['documents']['code'].values())
+    prompt = ENVIRONMENT_SETUP_PROMPT.format(code=code)
+    structured_llm = llm.with_structured_output(EnvironmentSetup)
+    reqs = structured_llm.invoke([HumanMessage(content=prompt)])
+    state["documents"].update(reqs.dict())
+
+    # check if the required packages are installed
+    package_list = reqs.requirements.split('\n')
+    print(package_list)
+    results = check_and_install_packages(package_list)
+    # Check if any package failed to install
+    if any(pkg_result['installed'] == False for pkg_result in results.values()):
+        failed_packages = [pkg for pkg, result in results.items() if result['installed'] == False]
+        msg = f"Failed to install packages: {', '.join(failed_packages)}"
+        msg += '\n'.join([f"{pkg}: {results[pkg]['message']}" for pkg in failed_packages])
+        state['messages'].append(msg)
+    
+    # write out the files to the temp/ directory
+    try:
+        create_repository("temp", state['documents'])
+    except Exception as e:
+        state['messages'].append(f"Failed to create the repository: {e}")
+        raise e
+
+    return state
+
+# def approve_environment_setup(state: GraphState):
+#     """
+#     Test the requirements.txt file.
+#     """
+#     logging.info("---APPROVE ENVIRONMENT SETUP---")
+#     # need a shell to run the requirements.txt file and see if it works
+#     state['approvals'].update({"requirements": True})
+#     return state
+
+def route_environment_setup(state: GraphState) -> Literal['approve_acceptance_tests', 'environment_setup']:
+    if all(state["approvals"].values()):
+        return "approve_acceptance_tests"
+    else:
+        return "environment_setup"
+
+
+
+
+
+
+
+
+
 
 def build_graph():
 

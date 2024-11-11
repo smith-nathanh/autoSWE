@@ -235,7 +235,8 @@ architecture_design.md
 {architecture_design}
 
 
-Write each file to a dictionary with the filename as the key and the content as the value.
+Write each file in the architecture_design to a dictionary with the filename as the key and the respective content as the value.
+Be sure the content is the full apprroriate content for each file - such as the fully implemented code for a script file.
 Nest all the files in a dictionary with the key "code" and return this nested dictionary.
 """
 
@@ -285,7 +286,7 @@ architecture_design.md
 ----------------------
 {architecture_design}
 
-Write the content of the acceptance test to a dictionary where the key is the filename and the value is the content of the acceptance test..
+Write the content of the acceptance test to a dictionary where the key is "test_features" and the value is the content of the acceptance test.
 Make another key in this dictionary called "command" and write the command to run the acceptance test(s).
 Nest this dictionary in another dictionary with the key "acceptance_tests" and return this nested dictionary.
 """
@@ -313,15 +314,7 @@ architecture_design.md
 ----------------------
 {architecture_design}
 
-Write the content of the unit tests to a dictionary where the key is the filename and the value is the content of the acceptance test..
+Write the content of the unit tests to a dictionary where the key is "test_module" and the value is the content of the unit test.
 Make another key in this dictionary called "command" and write the command to run the unit test(s).
 Nest this dictionary in another dictionary with the key "unit_tests" and return this nested dictionary.
-"""
-
-
-APPROVE_ACCEPTANCE_TESTS_PROMPT = """
-Generate a command to run the acceptance tests and verify that the software adheres to the requirements in the PRD.
-
-Here is the acceptance test file you will run:
-{acceptance_tests}
 """

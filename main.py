@@ -33,10 +33,9 @@ def main():
     state = {'documents': {'PRD': prd_content},
              'messages': [HumanMessage(content=DESIGN_PROMPT.format(PRD=prd_content))]}
     final_state = graph.invoke(state)
-    print(final_state)
 
     # save the final state to a json file
-    #with open(args.out_path, 'w') as file:
+    # with open(args.out_path, 'w') as file:
     #    json.dump(final_state, file, indent=4)
 
 
