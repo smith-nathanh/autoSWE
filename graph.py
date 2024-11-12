@@ -327,7 +327,8 @@ def approve_acceptance_tests(state: GraphState):
     logging.info("---APPROVE ACCEPTANCE TESTS---")
     
     try:
-        cmd = f"cd temp && {state['documents']['acceptance_tests']['command']}"
+        root_dir = next(iter(state['documents']['code'])).split('/')[0]
+        cmd = f"cd temp/{root_dir} && {state['documents']['acceptance_tests']['command']}"
         # Run command in shell, capture output
         process = subprocess.run(
             cmd,

@@ -235,7 +235,7 @@ architecture_design.md
 {architecture_design}
 
 
-Write each file in the architecture_design to a dictionary with the filename as the key and the respective content as the value.
+Write each file in the architecture_design to a dictionary with the full path to the filename as the key and the respective content as the value.
 Be sure the content is the full apprroriate content for each file - such as the fully implemented code for a script file.
 Nest all the files in a dictionary with the key "code" and return this nested dictionary.
 """
@@ -286,8 +286,10 @@ architecture_design.md
 ----------------------
 {architecture_design}
 
+The acceptance tests will be written using the unittest module and ultimately be written to a file at: tests/acceptance/test_features.py. Keep this in mind.
+
 Write the content of the acceptance test to a dictionary where the key is "test_features" and the value is the content of the acceptance test.
-Make another key in this dictionary called "command" and write the command to run the acceptance test(s).
+Make another key in this dictionary called "command" and write the command to run the acceptance test as the value for the "command" key.
 Nest this dictionary in another dictionary with the key "acceptance_tests" and return this nested dictionary.
 """
 
@@ -314,7 +316,10 @@ architecture_design.md
 ----------------------
 {architecture_design}
 
+
+The unit tests will be written using the unittest module and ultimately written to a file at: tests/unit/test_module.py. Keep this in mind.
+
 Write the content of the unit tests to a dictionary where the key is "test_module" and the value is the content of the unit test.
-Make another key in this dictionary called "command" and write the command to run the unit test(s).
+Make another key in this dictionary called "command" and write the command to run the unit tests as the value for the "command" key.
 Nest this dictionary in another dictionary with the key "unit_tests" and return this nested dictionary.
 """
