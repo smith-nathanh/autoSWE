@@ -6,3 +6,6 @@ tester.ipynb
 temp/
 sample.py
 __pycache__/utils.cpython-310.pyc
+outputs/
+__pycache__/structure.cpython-310.pyc
+__pycache__/tools.cpython-310.pyc
