@@ -11,7 +11,7 @@ DevBench has five evaluation tasks:
 5. Unit Testing
 
 
-We have implemented a system that can automatically generate the artifacts for these tasks. The system uses LangGraph to orchestrate the control flow of the system and the artifacts are accumulated in a state object.
+We have implemented a system that can automatically generate the artifacts for these tasks. The system uses LangGraph to orchestrate the control flow of the system and the artifacts are accumulated in a state object. It will check for and handle installing necessary dependencies to run the code it generates.
 
 ### Control flow
 

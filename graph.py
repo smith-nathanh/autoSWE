@@ -172,7 +172,11 @@ def acceptance_tests(state: GraphState):
     Generate acceptance tests for the software.
     """
     logging.info("---ACCEPTANCE TESTS---")
-    prompt = ACCEPTANCE_TEST_PROMPT.format(**state["documents"])
+    code = '\n\n'.join(f"# ---{filename}---\n{content}" 
+                       for filename, content in state['documents']['code'].items())
+    prompt = ACCEPTANCE_TEST_PROMPT.format(PRD=state["documents"]['PRD'],
+                                           architecture_design=state["documents"]['architecture_design'],
+                                           code=code)
     structured_llm = llm.with_structured_output(AcceptanceTests)
     test = structured_llm.invoke([HumanMessage(content=prompt)])
     state["documents"].update(test.dict())
@@ -221,10 +225,11 @@ def unit_tests(state: GraphState):
     Generate unit tests for the software.
     """
     logging.info("---UNIT TESTS---")
-    prompt = UNIT_TEST_PROMPT.format(**state["documents"]
-                                     # also pass the code here or maybe chunk it
-                                     # maybe don't pass all the other documents, just the code not sure yet
-                                     )
+    code = '\n\n'.join(f"# ---{filename}---\n{content}" 
+                       for filename, content in state['documents']['code'].items())
+    prompt = UNIT_TEST_PROMPT.format(PRD=state["documents"]['PRD'],
+                                           architecture_design=state["documents"]['architecture_design'],
+                                           code=code)
     structured_llm = llm.with_structured_output(UnitTests)
     test = structured_llm.invoke([HumanMessage(content=prompt)])
     state["documents"].update(test.dict())

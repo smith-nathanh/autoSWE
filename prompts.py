@@ -268,23 +268,21 @@ ACCEPTANCE_TEST_PROMPT = """
 
 Given the inputs, generate appropriate acceptance tests in one file ensuring the software adheres to requirements in the PRD.
 
+Pay close attention to the code and the PRD to ensure the tests are comprehensive and faithful to the PRD.
+
 Here are the input documents for you to reference:
 
 PRD.md
 -----------
 {PRD}
 
-UML_class.md
------------
-{UML_class}
-
-UML_sequence.md
----------------
-{UML_sequence}
-
 architecture_design.md
 ----------------------
 {architecture_design}
+
+Code
+-----------
+{code}
 
 The acceptance tests will be written using the unittest module and ultimately be written to a file at: tests/acceptance/test_features.py. Keep this in mind.
 
@@ -296,7 +294,7 @@ Nest this dictionary in another dictionary with the key "acceptance_tests" and r
 UNIT_TEST_PROMPT = """
 Generate unit tests to ensure the software adheres to the requirements in the PRD. 
 
-Pay special attention to the UML class diagram and the architecture design.
+Pay close attention to the code and the PRD to ensure the tests are comprehensive and accurate.
 
 Here are the input documents for reference:
 
@@ -304,18 +302,13 @@ PRD.md
 -----------
 {PRD}
 
-UML_class.md
------------
-{UML_class}
-
-UML_sequence.md
----------------
-{UML_sequence}
-
 architecture_design.md
 ----------------------
 {architecture_design}
 
+Code
+-----------
+{code}
 
 The unit tests will be written using the unittest module and ultimately written to a file at: tests/unit/test_module.py. Keep this in mind.
 
