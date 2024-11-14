@@ -1,19 +1,21 @@
 # autoSWE
 
-Benchmarking the performance of automated software engineering against DevBench. 
+AutoSWE is a system for producing entire code repositories from a PRD.md file. It is designed to produce the artifacts necessary for the [DevBench ](https://github.com/open-compass/DevBench) benchmark designed to evaluate the effectiveness of LLM-based code generation. It differs from typical evaluations of LLM-coding systems in that it is designed to evaluate the entire software engineering process, not just bug fixes or code completion.
 
-The 5 evaluations in DevBench will serve as the primary nodes in the system. Progression to the next node is determined by hardcoded logic or an LLM in "approve_" prefixed nodes. 
+DevBench has five evaluation tasks:
 
-Tasks/Nodes:
 1. Software Design
 2. Environment Setup
 3. Implementation
 4. Acceptance Testing
 5. Unit Testing
 
+
+We have implemented a system that can automatically generate the artifacts for these tasks. The system uses LangGraph to orchestrate the control flow of the system and the artifacts are accumulated in a state object.
+
 ### Control flow
 
-We use langgraph to manage the control flow of the system. Decision nodes make decisions based on hard-coded rules or an LLM can be used to make the decision. They are prefixed with "approve_". They have conditional edges to route the flow of the system. 
+We use langgraph to manage the control flow of the system and nodes prefixed with "approve_" evaluate the documents/code and either approve the documents/code or circle back with a message regarding what is incorrect. They have conditional edges to route the flow of the system. 
 
 ![alt text](images/swegraph.png)
 
