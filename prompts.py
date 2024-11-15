@@ -236,8 +236,9 @@ architecture_design.md
 
 
 Write each file in the architecture_design to a dictionary with the full path to the filename as the key and the respective content as the value.
-Be sure the content is the full apprroriate content for each file - such as the fully implemented code for a script file.
-Nest all the files in a dictionary with the key "code" and return this nested dictionary.
+Be sure the content is the full apprroriate content for each file - such as the fully implemented code for a script or any csv/json files listed in the PRD and/or architecture_design.
+
+Finally, make the first dictionary be the value to a key "code" in a main dictionary and return the main dictionary.
 """
 
 
@@ -265,11 +266,6 @@ and its representation in code.
 """
 
 ACCEPTANCE_TEST_PROMPT = """
-
-Given the inputs, generate appropriate acceptance tests in one file ensuring the software adheres to requirements in the PRD.
-
-Pay close attention to the code and the PRD to ensure the tests are comprehensive and faithful to the PRD.
-
 Here are the input documents for you to reference:
 
 PRD.md
@@ -284,18 +280,17 @@ Code
 -----------
 {code}
 
-The acceptance tests will be written using the unittest module and ultimately be written to a file at: tests/acceptance/test_features.py. Keep this in mind.
 
+--------Instructions--------
+Given the inputs, generate appropriate acceptance tests in one file ensuring the software adheres to requirements in the PRD.
+Pay close attention to the code and the PRD to ensure the tests are comprehensive and faithful to the PRD.
+The acceptance tests will be written using the unittest module and ultimately be written to a file at: tests/acceptance/test_features.py. Keep this in mind.
 Write the content of the acceptance test to a dictionary where the key is "test_features" and the value is the content of the acceptance test.
 Make another key in this dictionary called "command" and write the command to run the acceptance test as the value for the "command" key.
 Nest this dictionary in another dictionary with the key "acceptance_tests" and return this nested dictionary.
 """
 
 UNIT_TEST_PROMPT = """
-Generate unit tests to ensure the software adheres to the requirements in the PRD. 
-
-Pay close attention to the code and the PRD to ensure the tests are comprehensive and accurate.
-
 Here are the input documents for reference:
 
 PRD.md
@@ -310,8 +305,11 @@ Code
 -----------
 {code}
 
-The unit tests will be written using the unittest module and ultimately written to a file at: tests/unit/test_module.py. Keep this in mind.
 
+-----Instructions--------
+Your task is to generate unit tests to ensure the software adheres to the requirements in the PRD. 
+Pay close attention to the code and the PRD to ensure the tests are comprehensive and accurate.
+The unit tests will be written using the unittest module and ultimately written to a file at: tests/unit/test_module.py. Keep this in mind.
 Write the content of the unit tests to a dictionary where the key is "test_module" and the value is the content of the unit test.
 Make another key in this dictionary called "command" and write the command to run the unit tests as the value for the "command" key.
 Nest this dictionary in another dictionary with the key "unit_tests" and return this nested dictionary.
