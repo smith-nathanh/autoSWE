@@ -19,7 +19,6 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Run the SWEGraph with a specified PRD.")
     parser.add_argument("--prd_path", type=str, default=None, help="Path to the PRD file")
-    parser.add_argument("--out_path", type=str, default="output.json", help="Path to the output file")
     args = parser.parse_args()
 
     if args.prd_path is None:
@@ -33,10 +32,6 @@ def main():
     state = {'documents': {'PRD': prd_content},
              'messages': [HumanMessage(content=DESIGN_PROMPT.format(PRD=prd_content))]}
     final_state = graph.invoke(state)
-
-    # save the final state to a json file
-    # with open(args.out_path, 'w') as file:
-    #    json.dump(final_state, file, indent=4)
 
 
 if __name__ == "__main__":

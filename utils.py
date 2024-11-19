@@ -46,7 +46,9 @@ def check_and_install_packages(packages: List[str]) -> Dict[str, Dict[str, Union
 def write_files(base_path: str, files_content: Dict[str, str]) -> None:
     """Write files based on dictionary input"""
     for file_path, content in files_content.items():
-        full_path = os.path.join(base_path, file_path)
+        # Strip leading slash to ensure relative path
+        clean_path = file_path.lstrip('/')
+        full_path = os.path.join(base_path, clean_path)
         
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
@@ -62,8 +64,8 @@ def create_repository(base_path: str, documents: Dict) -> None:
 
     files = copy.deepcopy(documents['code'])
 
-    # Get root directory from first key in files_content
-    root_dir = next(iter(files)).split('/')[0]
+    # Get first directory name, handling paths with leading slash
+    root_dir = next(name for name in next(iter(files)).split('/') if name)
     
     files.update({
         f'{root_dir}/tests/unit/test_module.py': documents['unit_tests']['test_module'],

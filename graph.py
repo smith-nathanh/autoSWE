@@ -298,7 +298,7 @@ def environment_setup(state: GraphState):
     try:
         create_repository("temp", state['documents'])
     except Exception as e:
-        state['messages'].append(f"Failed to create the repository: {e}")
+        state['messages'].append(f"Failed to create the repository: {str(e)}")
         raise e
 
     return state
