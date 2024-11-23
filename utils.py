@@ -69,7 +69,9 @@ def create_repository(base_path: str, documents: Dict) -> None:
     
     files.update({
         f'{root_dir}/tests/unit/test_module.py': documents['unit_tests']['test_module'],
+        f'{root_dir}/tests/unit/__init__.py': '',
         f'{root_dir}/tests/acceptance/test_features.py': documents['acceptance_tests']['test_features'],
+        f'{root_dir}/tests/acceptance/__init__.py': '',
         f'{root_dir}/docs/PRD.md': documents['PRD'],
         f'{root_dir}/docs/UML_class.md': documents['UML_class'],
         f'{root_dir}/docs/UML_sequence.md': documents['UML_sequence'],
