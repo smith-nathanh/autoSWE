@@ -1,7 +1,7 @@
 from typing import Any, List, Dict, Type, Union, Literal, Annotated
 from langchain_core.tools import tool
 from langgraph.prebuilt import InjectedState, ToolNode, ToolExecutor, tools_condition
-from structure import GraphState
+from system.structure import GraphState
 
 @tool
 def view_document(document_name: str, state: Annotated[dict, InjectedState]) -> str:

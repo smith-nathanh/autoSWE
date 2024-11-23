@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="#prd" class="list-group-item list-group-item-action">PRD</a>
+            <a href="#class-diagram" class="list-group-item list-group-item-action">Class Diagram</a>
+            <a href="#sequence-diagram" class="list-group-item list-group-item-action">Sequence Diagram</a>
+            <a href="#architecture" class="list-group-item list-group-item-action">Architecture</a>
+            <a href="#code-files" class="list-group-item list-group-item-action">Code Files</a>
+            <a href="#unit-tests" class="list-group-item list-group-item-action">Unit Tests</a>
+            <a href="#acceptance-tests" class="list-group-item list-group-item-action">Acceptance Tests</a>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <section id="prd" class="mb-5">
+            <h3>Product Requirements Document</h3>
+            <div class="markdown-content">
+                {{ artifacts.prd | safe }}
+            </div>
+        </section>
+
+        <section id="class-diagram" class="mb-5">
+            <h3>Class Diagram</h3>
+            <div class="mermaid">
+                {{ artifacts.class_diagram }}
+            </div>
+        </section>
+
+        <section id="sequence-diagram" class="mb-5">
+            <h3>Sequence Diagram</h3>
+            <div class="mermaid">
+                {{ artifacts.sequence_diagram }}
+            </div>
+        </section>
+
+        <section id="architecture" class="mb-5">
+            <h3>Architecture Design</h3>
+            <pre><code class="language-text">{{ artifacts.architecture }}</code></pre>
+        </section>
+
+        <section id="code-files" class="mb-5">
+            <h3>Code Files</h3>
+            {% for filename, content in artifacts.code_files.items() %}
+            <div class="mb-3">
+                <h4>{{ filename }}</h4>
+                <pre><code class="language-python">{{ content }}</code></pre>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section id="unit-tests" class="mb-5">
+            <h3>Unit Tests</h3>
+            {% for filename, content in artifacts.unit_tests.items() %}
+            <div class="mb-3">
+                <h4>{{ filename }}</h4>
+                <pre><code class="language-python">{{ content }}</code></pre>
+            </div>
+            {% endfor %}
+        </section>
+
+        <section id="acceptance-tests" class="mb-5">
+            <h3>Acceptance Tests</h3>
+            {% for filename, content in artifacts.acceptance_tests.items() %}
+            <div class="mb-3">
+                <h4>{{ filename }}</h4>
+                <pre><code class="language-python">{{ content }}</code></pre>
+            </div>
+            {% endfor %}
+        </section>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('download_temp') }}" class="btn btn-secondary">
+                <i class="fas fa-download"></i> Download Generated Files
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+        Prism.highlightAll();
+    });
+</script>
+{% endblock %}

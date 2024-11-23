@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="intro-section text-center mb-5">
+        <h1 class="display-4 mb-3">Welcome to autoSWE</h1>
+        <p class="lead mb-4">An AI-powered software engineering assistant that transforms your PRD into production-ready code.</p>
+        <div class="description mb-4">
+            <p>Simply upload your PRD markdown file and autoSWE will generate:</p>
+            <ul class="list-unstyled">
+                <li>📊 UML Diagrams</li>
+                <li>✨ System Architecture</li>
+                <li>🔧 Production Code</li>
+                <li>🎯 Acceptance Tests</li>
+                <li>🧪 Unit Tests</li>
+            </ul>
+        </div>
+        <div class="upload-section">
+            <form method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <input type="file" class="form-control" id="file" name="file" accept=".md">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">Generate Artifacts</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
