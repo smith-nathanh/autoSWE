@@ -17,7 +17,7 @@ We have implemented a system that can automatically generate the artifacts for t
 
 We use langgraph to manage the control flow of the system and nodes prefixed with "approve_" evaluate the documents/code and either approve the documents/code or circle back with a message regarding what is incorrect. They have conditional edges to route the flow of the system. 
 
-![alt text](images/swegraph.png)
+![alt text](system/images/swegraph.png)
 
 In the graph `state` we accumulate "documents" produced by each node in the graph these are our final artifacts/outputs. 
 
