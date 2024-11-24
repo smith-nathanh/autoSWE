@@ -83,11 +83,16 @@ TextCNN (Convolutional Neural Networks for Text Classification) is a convolution
 
 
 DESIGN_PROMPT = """
-Given the following PRD {PRD}
+Consider the following product requirements document (PRD)
 
-Return a dictionary with the following keys:
-* Create UML class diagram using mermaid syntax as key "UML_class"
-* Create  UML sequence diagram using mermaid syntax as key "UML_sequence"
+PRD
+-----------
+{PRD}
+
+Using the PRD as a source of truth and guideline, generate some specific artifacts.
+You should return a dictionary with the following keys:
+* Create a UML class diagram using mermaid syntax for Mermaid 10.2.3 as key "UML_class"
+* Create a UML sequence diagram using mermaid syntax for Mermaid 10.2.3 as key "UML_sequence"
 * Create architecture design as a text based representation of the file tree as key "architecture_design"
 """
 

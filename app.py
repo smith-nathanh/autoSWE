@@ -1,6 +1,8 @@
 import os
 import zipfile
-import shutil
+import logging
+from dotenv import load_dotenv
+from langsmith import utils
 from pathlib import Path
 from flask import Flask, render_template, request, flash, redirect, url_for, send_file
 from werkzeug.utils import secure_filename
@@ -16,6 +18,10 @@ ALLOWED_EXTENSIONS = {'md'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'development-key-change-in-production'
+
+load_dotenv(dotenv_path="system/.env", override=True)
+logging.info('TRACING %s', str(utils.tracing_is_enabled()))
+logging.info(os.environ["LANGCHAIN_PROJECT"])
 
 # Ensure upload directory exists
 Path(UPLOAD_FOLDER).mkdir(exist_ok=True)

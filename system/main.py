@@ -34,7 +34,7 @@ def main():
 
 
 if __name__ == "__main__":
-    load_dotenv(dotenv_path=".env", override=True)
+    load_dotenv(dotenv_path="system/.env", override=True)
     logging.info('TRACING %s', str(utils.tracing_is_enabled()))
     logging.info(os.environ["LANGCHAIN_PROJECT"])
     main()
