@@ -7,3 +7,6 @@ temp/
 .gitignore
 __pycache__/
 uploads/
+templates/_view_artifacts.html
+templates/test.html
+uploads/

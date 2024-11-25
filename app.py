@@ -100,16 +100,15 @@ def upload_file():
 
 @app.route('/download_temp')
 def download_temp():
-    temp_dir = Path(app.config['UPLOAD_FOLDER'])
+    temp_dir = Path('temp')
     
     # Create zip file in memory
     memory_file = BytesIO()
     
     with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
         for file_path in temp_dir.rglob('*'):
-            if file_path.is_file():
-                arcname = file_path.relative_to(temp_dir)
-                zf.write(file_path, arcname)
+            arcname = file_path.relative_to(temp_dir)
+            zf.write(file_path, arcname)
     
     memory_file.seek(0)
     

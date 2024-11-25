@@ -1,58 +1,57 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-3">
-        <div class="list-group" id="nav-tabs" role="tablist">
-            <a class="list-group-item list-group-item-action active" data-bs-toggle="tab" href="#prd" role="tab">PRD</a>
-            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#architecture" role="tab">Architecture</a>
-            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#class-diagram" role="tab">Class Diagram</a>
-            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#sequence-diagram" role="tab">Sequence Diagram</a>
-            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#code-files" role="tab">Code</a>
-            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#acceptance-tests" role="tab">Acceptance Tests</a>
-            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#unit-tests" role="tab">Unit Tests</a>
-        </div>
-        <div class="text-center mt-3">
-            <a href="{{ url_for('download_temp') }}" class="btn btn-secondary w-100">
-                <i class="fas fa-download"></i> Download
-            </a>
-        </div>
-        <div class="text-center mt-3">
-            <button id="return-button" class="btn btn-warning w-100">
-                Return to Main Page
-            </button>
-        </div>
-    </div>
-
-    <div class="col-md-9">
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="prd" role="tabpanel">
+<div class="container-fluid">
+    <div class="row">
+        <section id="sidebar" class="sidebar col-md-3">
+            <div class="list-group">
+                <a href="#prd" class="list-group-item list-group-item-action">PRD</a>
+                <a href="#architecture" class="list-group-item list-group-item-action">Architecture</a>
+                <a href="#class-diagram" class="list-group-item list-group-item-action">Class Diagram</a>
+                <a href="#sequence-diagram" class="list-group-item list-group-item-action">Sequence Diagram</a>
+                <a href="#code-files" class="list-group-item list-group-item-action">Code Files</a>
+                <a href="#unit-tests" class="list-group-item list-group-item-action">Unit Tests</a>
+                <a href="#acceptance-tests" class="list-group-item list-group-item-action">Acceptance Tests</a>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('download_temp') }}" class="btn btn-secondary w-100">
+                    <i class="fas fa-download"></i> Download
+                </a>
+            </div>
+            <div class="text-center mt-3">
+                <button id="return-button" class="btn btn-warning w-100">
+                    Return to Main Page
+                </button>
+            </div>
+        </section>
+        <div class="main-content col-md-9">
+            <section id="prd" class="mb-5">
                 <h3>Product Requirements Document</h3>
                 <div class="markdown-content">
                     {{ artifacts.prd | safe }}
                 </div>
-            </div>
+            </section>
 
-            <div class="tab-pane fade" id="class-diagram" role="tabpanel">
-                <h3>Class Diagram</h3>
-                <div class="mermaid">
-                    {{ artifacts.class_diagram | safe }}
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="sequence-diagram" role="tabpanel">
-                <h3>Sequence Diagram</h3>
-                <div class="mermaid">
-                    {{ artifacts.sequence_diagram | safe }}
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="architecture" role="tabpanel">
+            <section id="architecture" class="mb-5">
                 <h3>Architecture Design</h3>
                 <pre><code class="language-text">{{ artifacts.architecture }}</code></pre>
-            </div>
+            </section>
 
-            <div class="tab-pane fade" id="code-files" role="tabpanel">
+            <section id="class-diagram" class="mb-5">
+                <h3>Class Diagram</h3>
+                <div class="mermaid">
+                    {{ artifacts.class_diagram }}
+                </div>
+            </section>
+
+            <section id="sequence-diagram" class="mb-5">
+                <h3>Sequence Diagram</h3>
+                <div class="mermaid">
+                    {{ artifacts.sequence_diagram }}
+                </div>
+            </section>
+
+            <section id="code-files" class="mb-5">
                 <h3>Code Files</h3>
                 {% for filename, content in artifacts.code_files.items() %}
                 <div class="mb-3">
@@ -60,9 +59,9 @@
                     <pre><code class="language-python">{{ content }}</code></pre>
                 </div>
                 {% endfor %}
-            </div>
+            </section>
 
-            <div class="tab-pane fade" id="unit-tests" role="tabpanel">
+            <section id="unit-tests" class="mb-5">
                 <h3>Unit Tests</h3>
                 {% for filename, content in artifacts.unit_tests.items() %}
                 <div class="mb-3">
@@ -70,9 +69,9 @@
                     <pre><code class="language-python">{{ content }}</code></pre>
                 </div>
                 {% endfor %}
-            </div>
+            </section>
 
-            <div class="tab-pane fade" id="acceptance-tests" role="tabpanel">
+            <section id="acceptance-tests" class="mb-5">
                 <h3>Acceptance Tests</h3>
                 {% for filename, content in artifacts.acceptance_tests.items() %}
                 <div class="mb-3">
@@ -80,56 +79,25 @@
                     <pre><code class="language-python">{{ content }}</code></pre>
                 </div>
                 {% endfor %}
-            </div>
+            </section>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-<style>
-    .tab-pane {
-        overflow-y: auto;
-    }
-</style>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'dark',
-            securityLevel: 'loose',
-            maxTextSize: 100000,
-            logLevel: 'error',
-            // Remove fixed dimensions in the sequence config
-            sequence: {
-                diagramMarginX: 10,
-                diagramMarginY: 10,
-                actorMargin: 50,
-                useMaxWidth: true,         // Allow Mermaid to use maximum width
-                // Remove width and height properties
-            }
-        });
-
-        // Re-render diagrams on tab change
-        const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
-        tabs.forEach(tab => {
-            tab.addEventListener('shown.bs.tab', function () {
-                mermaid.init(undefined, '.mermaid');
-            });
-        });
-
-        // Initial render
-        mermaid.init(undefined, '.mermaid');
-
-        // Confirmation prompt for returning to main page
-        document.getElementById('return-button').addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent default behavior
-            if (confirm('Are you sure you want to return to the main page? Your repo artifacts will be lost if you do.')) {
-                window.location.href = '{{ url_for("upload_file") }}';
-            }
-            // If canceled, do nothing
-        });
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+        Prism.highlightAll();
+    });
+    // Confirmation prompt for returning to main page
+    document.getElementById('return-button').addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent default behavior
+        if (confirm('Are you sure you want to return to the main page? Your repo artifacts will be lost if you do.')) {
+            window.location.href = '{{ url_for("upload_file") }}';
+        }
+        // If canceled, do nothing
     });
 </script>
 {% endblock %}

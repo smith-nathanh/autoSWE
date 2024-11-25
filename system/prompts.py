@@ -91,8 +91,8 @@ PRD
 
 Using the PRD as a source of truth and guideline, generate some specific artifacts.
 You should return a dictionary with the following keys:
-* Create a UML class diagram using mermaid syntax for Mermaid 10.2.3 as key "UML_class"
-* Create a UML sequence diagram using mermaid syntax for Mermaid 10.2.3 as key "UML_sequence"
+* Create a UML class diagram using mermaid syntax for Mermaid 11 as key "UML_class"
+* Create a UML sequence diagram using mermaid syntax for Mermaid 11 as key "UML_sequence"
 * Create architecture design as a text based representation of the file tree as key "architecture_design"
 """
 

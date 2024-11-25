@@ -89,7 +89,7 @@ section {
 
 .markdown-content {
     padding: 1rem;
-    background-color: var(--bs-dark);
+    background-color: var(--bs-dark) !important;
     border-radius: 0.375rem;
     margin-bottom: 1rem;
 }
@@ -143,4 +143,26 @@ section {
 /* Add to custom.css if needed */
 #return-button {
     margin-top: 10px;
+}
+
+.dark-background {
+    background-color: #343a40; /* Darkish gray color */
+    color: #ffffff; /* Optional: to ensure text is readable */
+    padding: 15px; /* Optional: to add some padding */
+    border-radius: 5px; /* Optional: to add rounded corners */
+}
+
+.sidebar {
+    position: fixed;
+    top: 100px; /* Adjust this value to move the sidebar down */
+    left: 100px; /* Adjust this value to move the sidebar to the right */
+    height: calc(100% - 40px); /* Adjust height to account for the top margin */
+    overflow-y: auto;
+    background-color: inherit; /* Ensure the background color matches the rest of the page */
+    z-index: 1000; /* Ensure it stays on top */
+}
+
+.main-content {
+    margin-left: 270px; /* Adjust this value based on the width of your sidebar and left margin */
+    padding: 20px;
 }

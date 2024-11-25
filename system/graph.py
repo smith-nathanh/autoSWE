@@ -285,7 +285,6 @@ def environment_setup(state: GraphState):
 
     # check if the required packages are installed
     package_list = reqs.requirements.split('\n')
-    print(package_list)
     results = check_and_install_packages(package_list)
     # Check if any package failed to install
     if any(pkg_result['installed'] == False for pkg_result in results.values()):
