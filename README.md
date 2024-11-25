@@ -1,6 +1,6 @@
 # autoSWE
 
-autoSWE is a software engineering automation tool designed to streamline and optimize various development workflows. It provides a set of features that help developers automate repetitive tasks, manage project configurations, and integrate with other development tools seamlessly.
+autoSWE is a software engineering automation tool designed to produce a fully-functioning code repository based on input Produce Requirements Document (PRD). It produces the artifacts measured in [DevBench ](https://github.com/open-compass/DevBench), a software engineering benchmark designed to test the efficacy of LLM-based code generation systems.
 
 For more detailed information on the features, tools, and processes used in autoSWE, please refer to the [system/README.md](system/README.md) document.
 
