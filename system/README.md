@@ -1,6 +1,6 @@
 # autoSWE
 
-AutoSWE is a system for producing entire code repositories from a PRD.md file. It is designed to produce the artifacts necessary for the [DevBench ](https://github.com/open-compass/DevBench) benchmark designed to evaluate the effectiveness of LLM-based code generation. It differs from typical evaluations of LLM-coding systems in that it is designed to evaluate the entire software engineering process, not just bug fixes or code completion.
+AutoSWE is a system for producing entire code repositories from a PRD.md file. It is designed to produce the artifacts necessary for the [DevBench ](https://github.com/open-compass/DevBench) benchmark which was established to evaluate the effectiveness of LLM-based code generation. It differs from typical evaluations of LLM-coding systems in that it is designed to evaluate the entire software engineering process, not just bug fixes or code completion.
 
 DevBench has five evaluation tasks:
 
@@ -12,6 +12,8 @@ DevBench has five evaluation tasks:
 
 
 We have implemented a system that can automatically generate the artifacts for these tasks. The system uses LangGraph to orchestrate the control flow of the system and the artifacts are accumulated in a `state` object. We use Pydantic to validate for structured outputs of the LLMs for each task - such as requesting dictionaries with specific keys. The system will also check for and handle installing necessary dependencies to run the code it generates.
+
+We use LangChain, LangGraph, and LangSmith for tracing the OpenAI API calls and the `state` of the system. We use GPT-4o as the LLM.
 
 ### Control flow
 
