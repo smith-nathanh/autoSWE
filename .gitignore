@@ -6,8 +6,5 @@ system/__pycache__/
 temp/
 .gitignore
 __pycache__/
-uploads/
-templates/_view_artifacts.html
-templates/test.html
-uploads/
-logfile.log
+ui/uploads/
+ui/logfile.log
