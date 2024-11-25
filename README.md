@@ -1,48 +1,35 @@
 # autoSWE
 
-AutoSWE is a system for producing entire code repositories from a PRD.md file. It is designed to produce the artifacts necessary for the [DevBench ](https://github.com/open-compass/DevBench) benchmark designed to evaluate the effectiveness of LLM-based code generation. It differs from typical evaluations of LLM-coding systems in that it is designed to evaluate the entire software engineering process, not just bug fixes or code completion.
+autoSWE is a software engineering automation tool designed to streamline and optimize various development workflows. It provides a set of features that help developers automate repetitive tasks, manage project configurations, and integrate with other development tools seamlessly.
 
-DevBench has five evaluation tasks:
+For more detailed information on the features, tools, and processes used in autoSWE, please refer to the [system/README.md](system/README.md) document.
 
-1. Software Design
-2. Environment Setup
-3. Implementation
-4. Acceptance Testing
-5. Unit Testing
+## Features
 
+- Automated code generation from an input PRD.md file
 
-We have implemented a system that can automatically generate the artifacts for these tasks. The system uses LangGraph to orchestrate the control flow of the system and the artifacts are accumulated in a `state` object. We use Pydantic to validate for structured outputs of the LLMs for each task - such as requesting dictionaries with specific keys. The system will also check for and handle installing necessary dependencies to run the code it generates.
+## Deployment with Flask
 
-### Control flow
+autoSWE is deployed using Flask, a lightweight WSGI web application framework in Python. Flask makes it easy to set up a web server and handle HTTP requests.
 
-We use langgraph to manage the control flow of the system and nodes prefixed with "approve_" evaluate the documents/code and either approve the documents/code or circle back with a message regarding what is incorrect. They have conditional edges to route the flow of the system. 
+### Installation
 
-![alt text](system/images/swegraph.png)
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/autoSWE.git
+    cd autoSWE
+    ```
 
-In the graph `state` we accumulate "documents" produced by each node in the graph these are our final artifacts/outputs. 
+2. Install the required dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## Examples
+### Running the Flask App
 
-A `.env.` file is required (see .env.example). It should contain the following:
-
+To launch the Flask application, run the following command:
 ```bash
-OPENAI_API_KEY="your key"
-LANGCHAIN_API_KEY="your key"
-LANGCHAIN_TRACING_V2="true"
-LANGCHAIN_PROJECT="autoSWE-1"
-LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
+python main.py
 ```
 
-You will need to make an account at [Langchain](https://langchain.com). 
-
-To point at a specific PRD.md file and run the full program:
-```python
-python main.py --prd_path path/to/PRD.md
-```
-
-Alternatively, you can run the example PRD.md file in the repo:
-
-```python
-python main.py --out_path outputs/sample.json
-```
-
+This will start the Flask development server, and you can access the application by navigating to `http://127.0.0.1:5000` in your web browser.
