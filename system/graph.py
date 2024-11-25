@@ -18,7 +18,7 @@ from system.structure import (GraphState,
 from system.tools import (view_document,update_document,add_document,delete_document)
 
 # set logging level
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 
 # need to find better place for this, I believe this can be specified in a config
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0)

@@ -4,13 +4,14 @@ import logging
 from dotenv import load_dotenv
 from langsmith import utils
 from pathlib import Path
-from flask import Flask, render_template, request, flash, redirect, url_for, send_file
+from flask import Flask, render_template, request, flash, redirect, url_for, send_file, Response
 from werkzeug.utils import secure_filename
 import markdown
 from langchain_core.messages import HumanMessage
 from system.graph import build_graph
 from system.prompts import DESIGN_PROMPT
 from io import BytesIO
+import time
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'md'}
@@ -20,8 +21,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'development-key-change-in-production'
 
 load_dotenv(dotenv_path="system/.env", override=True)
+logging.basicConfig(filename='logfile.log', level=logging.INFO, filemode='w')
 logging.info('TRACING %s', str(utils.tracing_is_enabled()))
 logging.info(os.environ["LANGCHAIN_PROJECT"])
+
+# Exclude werkzeug logs from logfile.log
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.setLevel(logging.WARNING)
 
 # Ensure upload directory exists
 Path(UPLOAD_FOLDER).mkdir(exist_ok=True)
@@ -35,8 +41,10 @@ def generate_artifacts(prd_file_path):
         # Read the PRD content
         with open(prd_file_path, 'r') as f:
             prd_content = f.read()
+        logging.info("PRD content read successfully")
     except Exception as e:
         flash(f"Error reading PRD file: {str(e)}")
+        logging.error(f"Error reading PRD file: {str(e)}")
         return None
     
     try:
@@ -48,7 +56,9 @@ def generate_artifacts(prd_file_path):
         }
         
         # Generate artifacts using the graph
+        logging.info("Starting artifact generation")
         final_state = graph.invoke(state)
+        logging.info("Artifact generation completed")
         
         # Map the final state to our web display structure
         artifacts = {
@@ -65,6 +75,7 @@ def generate_artifacts(prd_file_path):
         
     except Exception as e:
         flash(f"Error generating artifacts: {str(e)}")
+        logging.error(f"Error generating artifacts: {str(e)}")
         return None
 
 @app.route('/', methods=['GET', 'POST'])
@@ -118,3 +129,19 @@ def download_temp():
         as_attachment=True,
         download_name='generated_artifacts.zip'
     )
+
+@app.route('/progress')
+def progress():
+    def generate():
+        # Ensure the log file exists
+        open('logfile.log', 'a').close()
+        
+        with open('logfile.log') as f:
+            while True:
+                line = f.readline()
+                if not line:
+                    time.sleep(1)
+                    continue
+                yield f"data: {line}\n\n"
+    
+    return Response(generate(), mimetype='text/event-stream')
