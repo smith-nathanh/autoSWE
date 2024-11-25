@@ -13,15 +13,16 @@ from system.prompts import DESIGN_PROMPT
 from io import BytesIO
 import time
 
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'ui/uploads'
+LOGFILE = 'ui/logfile.log'
 ALLOWED_EXTENSIONS = {'md'}
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='ui/templates', static_folder='ui/static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'development-key-change-in-production'
 
 load_dotenv(dotenv_path="system/.env", override=True)
-logging.basicConfig(filename='logfile.log', level=logging.INFO, filemode='w')
+logging.basicConfig(filename=LOGFILE, level=logging.INFO, filemode='w')
 logging.info('TRACING %s', str(utils.tracing_is_enabled()))
 logging.info(os.environ["LANGCHAIN_PROJECT"])
 
@@ -134,9 +135,9 @@ def download_temp():
 def progress():
     def generate():
         # Ensure the log file exists
-        open('logfile.log', 'a').close()
+        open(LOGFILE, 'a').close()
         
-        with open('logfile.log') as f:
+        with open(LOGFILE) as f:
             while True:
                 line = f.readline()
                 if not line:

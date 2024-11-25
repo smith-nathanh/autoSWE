@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group" id="nav-tabs" role="tablist">
+            <a class="list-group-item list-group-item-action active" data-bs-toggle="tab" href="#prd" role="tab">PRD</a>
+            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#architecture" role="tab">Architecture</a>
+            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#class-diagram" role="tab">Class Diagram</a>
+            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#sequence-diagram" role="tab">Sequence Diagram</a>
+            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#code-files" role="tab">Code</a>
+            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#acceptance-tests" role="tab">Acceptance Tests</a>
+            <a class="list-group-item list-group-item-action" data-bs-toggle="tab" href="#unit-tests" role="tab">Unit Tests</a>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{{ url_for('download_temp') }}" class="btn btn-secondary w-100">
+                <i class="fas fa-download"></i> Download
+            </a>
+        </div>
+        <div class="text-center mt-3">
+            <button id="return-button" class="btn btn-warning w-100">
+                Return to Main Page
+            </button>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="prd" role="tabpanel">
+                <h3>Product Requirements Document</h3>
+                <div class="markdown-content">
+                    {{ artifacts.prd | safe }}
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="class-diagram" role="tabpanel">
+                <h3>Class Diagram</h3>
+                <div class="mermaid">
+                    classDiagram
+                    class Chakin {
+                    +search(lang: String): List
+                    +download(number: int, save_dir: String): void
+                    }
+                    class Dataset {
+                    -name: String
+                    -dimension: int
+                    -corpus: String
+                    -vocabularySize: String
+                    -method: String
+                    -language: String
+                    -paper: String
+                    -author: String
+                    -url: String
+                    }
+                    class CSVHandler {
+                    +readCSV(filePath: String): List~Dataset~
+                    }
+                    class ProgressBar {
+                    +start(): void
+                    +update(progress: int): void
+                    +finish(): void
+                    }
+                    Chakin --> CSVHandler : uses
+                    Chakin --> ProgressBar : uses
+                    CSVHandler --> Dataset : creates
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="sequence-diagram" role="tabpanel">
+                <h3>Sequence Diagram</h3>
+                <div class="mermaid">
+                    sequenceDiagram
+                    participant User
+                    participant CLI
+                    participant Chakin
+                    participant CSVHandler
+                    participant ProgressBar
+                    User->>CLI: Run search command
+                    CLI->>Chakin: search(lang)
+                    Chakin->>CSVHandler: readCSV("datasets.csv")
+                    CSVHandler-->>Chakin: List of Datasets
+                    Chakin-->>CLI: List of matching word vectors
+                    CLI-->>User: Display search results
+                    User->>CLI: Run download command
+                    CLI->>Chakin: download(number, save_dir)
+                    Chakin->>CSVHandler: readCSV("datasets.csv")
+                    CSVHandler-->>Chakin: List of Datasets
+                    Chakin->>ProgressBar: start()
+                    loop Downloading
+                    Chakin->>ProgressBar: update(progress)
+                    end
+                    Chakin->>ProgressBar: finish()
+                    Chakin-->>CLI: Download complete
+                    CLI-->>User: Notify download completion
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="architecture" role="tabpanel">
+                <h3>Architecture Design</h3>
+                <pre><code class="language-text">{{ artifacts.architecture }}</code></pre>
+            </div>
+
+            <div class="tab-pane fade" id="code-files" role="tabpanel">
+                <h3>Code Files</h3>
+                {% for filename, content in artifacts.code_files.items() %}
+                <div class="mb-3">
+                    <h4>{{ filename }}</h4>
+                    <pre><code class="language-python">{{ content }}</code></pre>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="tab-pane fade" id="unit-tests" role="tabpanel">
+                <h3>Unit Tests</h3>
+                {% for filename, content in artifacts.unit_tests.items() %}
+                <div class="mb-3">
+                    <h4>{{ filename }}</h4>
+                    <pre><code class="language-python">{{ content }}</code></pre>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="tab-pane fade" id="acceptance-tests" role="tabpanel">
+                <h3>Acceptance Tests</h3>
+                {% for filename, content in artifacts.acceptance_tests.items() %}
+                <div class="mb-3">
+                    <h4>{{ filename }}</h4>
+                    <pre><code class="language-python">{{ content }}</code></pre>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Include only one Mermaid script -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+<style>
+    .tab-pane {
+        overflow-y: auto;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            securityLevel: 'loose',
+            maxTextSize: 100000,
+            logLevel: 'error',
+            // Remove fixed dimensions in the sequence config
+            sequence: {
+                diagramMarginX: 10,
+                diagramMarginY: 10,
+                actorMargin: 50,
+                useMaxWidth: true,         // Allow Mermaid to use maximum width
+                // Remove width and height properties
+            }
+        });
+
+        // Re-render diagrams on tab change
+        const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+        tabs.forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function () {
+                mermaid.init(undefined, '.mermaid');
+            });
+        });
+
+        // Initial render
+        mermaid.init(undefined, '.mermaid');
+
+        // Confirmation prompt for returning to main page
+        document.getElementById('return-button').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default behavior
+            if (confirm('Are you sure you want to return to the main page? Your repo artifacts will be lost if you do.')) {
+                window.location.href = '{{ url_for("upload_file") }}';
+            }
+            // If canceled, do nothing
+        });
+    });
+
+    // Initialize Mermaid
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose',
+    });
+</script>
+{% endblock %}
