@@ -1,11 +1,23 @@
 prd_paths:
-  - benchmark_data/python/ArXiv_digest/docs/PRD.md
-  - benchmark_data/python/chakin/PRD.md
-  - benchmark_data/python/geotext/PRD.md
-  - benchmark_data/python/hone/docs/PRD.md
-  - benchmark_data/python/Hybrid_Images/docs/PRD.md
-  - benchmark_data/python/lice/PRD.md
-  - benchmark_data/python/particle-swarm-optimization/docs/PRD.md
-  - benchmark_data/python/readtime/docs/PRD.md
-  - benchmark_data/python/stocktrends/docs/PRD.md
-  - benchmark_data/python/TextCNN/PRD.md
+  ArXiv_Digest: "system/benchmark_data/python/ArXiv_digest/docs/PRD.md"
+  chakin: "system/benchmark_data/python/chakin/PRD.md"
+  geotext: "system/benchmark_data/python/geotext/PRD.md"
+  hone: "system/benchmark_data/python/hone/docs/PRD.md"
+  Hybrid_Images: "system/benchmark_data/python/Hybrid_Images/docs/PRD.md"
+  lice: "system/benchmark_data/python/lice/PRD.md"
+  particle_swarm_optimization: "system/benchmark_data/python/particle-swarm-optimization/docs/PRD.md"
+  readtime: "system/benchmark_data/python/readtime/docs/PRD.md"
+  stocktrends: "system/benchmark_data/python/stocktrends/docs/PRD.md"
+  TextCNN: "system/benchmark_data/python/TextCNN/PRD.md"
+
+tracker_v2:
+  ArXiv_Digest: 1
+  chakin: 1
+  geotext: 1
+  hone: 1
+  Hybrid_Images: 1
+  lice: 3 # changed the design prompt
+  particle_swarm_optimization: 1
+  readtime: 2 # changed the approve implementation prompt
+  stocktrends: 1
+  TextCNN: 1

@@ -4,6 +4,7 @@ from langgraph.graph import StateGraph, START, END
 from system.prompts import *
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, AnyMessage
 import logging
+from copy import deepcopy
 from langchain_openai import ChatOpenAI
 import subprocess
 from system.utils import check_and_install_packages, create_repository
@@ -16,9 +17,6 @@ from system.structure import (GraphState,
                        AcceptanceTests,
                        UnitTests)
 from system.tools import (view_document,update_document,add_document,delete_document)
-
-# set logging level
-#logging.basicConfig(level=logging.INFO)
 
 # need to find better place for this, I believe this can be specified in a config
 llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
@@ -106,11 +104,16 @@ def software_design(state: GraphState):
     Designs the markdown files for the software design.
     """
     logging.info("---SOFTWARE DESIGN---")
-    if "approvals" in state:
-        if not all(state['approvals'].values()): # this implies that we are back at this node after a rejection
-            assistant(state)
+    #if "approvals" in state:
+    #    if not all(state['approvals'].values()): # this implies that we are back at this node after a rejection
+    #        assistant(state)
+    prompt = deepcopy(state['messages'])
+    if 'approvals' in state:
+        if not all(state["approvals"].values()):
+            prompt = [HumanMessage(content=DESIGN_PROMPT.format(PRD=state["documents"]['PRD']))]
+            prompt.append(state['messages'][-1]) # add the message from the approver
     structured_llm = llm.with_structured_output(Design)
-    response = structured_llm.invoke(state['messages'])
+    response = structured_llm.invoke(prompt)
     state["documents"].update(response.dict())
     return state
 
@@ -143,7 +146,7 @@ def implementation(state: GraphState):
     prompt = [HumanMessage(content=IMPLEMENTATION_PROMPT.format(**state["documents"]))]
     if 'implementation' in state['approvals']:
         if not state['approvals']['implementation']:
-            prompt.append(state['messages'][-1]) # add the message from the controller
+            prompt.append(state['messages'][-1]) # add the message from the approver
     structured_llm = llm.with_structured_output(Implementation)
     code = structured_llm.invoke(prompt)
     state["messages"].append(prompt)

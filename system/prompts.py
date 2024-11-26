@@ -89,11 +89,16 @@ PRD
 -----------
 {PRD}
 
-Using the PRD as a source of truth and guideline, generate some specific artifacts.
-You should return a dictionary with the following keys:
-* Create a UML class diagram using mermaid syntax for Mermaid 11 as key "UML_class"
-* Create a UML sequence diagram using mermaid syntax for Mermaid 11 as key "UML_sequence"
-* Create architecture design as a text based representation of the file tree as key "architecture_design"
+
+-----Instructions------
+Using the PRD as a source of truth and guideline, I am going to ask you to generate some specific artifacts.
+Based on the specifications outlined in the PRD document, return a dictionary with the following keys:
+1. UML_class: A Mermaid 11 class diagram that reflects the class structure and relationships defined in the PRD
+2. UML_sequence: A Mermaid 11 sequence diagram showing the key interactions and flow between components as specified in the PRD
+3. architecture_design: A detailed text based representation of the file tree that is true to the PRD and includes but is not limited to:
+  - A root-level README.md file documenting the system overview
+  - An 'examples' directory containing:
+    - example_usage.sh demonstrating core functionality along with any additional example files that align with use cases mentioned in the PRD
 """
 
 APPROVE_DESIGN_PROMPT = """
@@ -240,10 +245,19 @@ architecture_design.md
 {architecture_design}
 
 
-Write each file in the architecture_design to a dictionary with the full path to the filename as the key and the respective content as the value.
-Be sure the content is the full apprroriate content for each file - such as the fully implemented code for a script or any csv/json files listed in the PRD and/or architecture_design.
-
-Finally, make the first dictionary be the value to a key "code" in a main dictionary and return the main dictionary.
+-----Instructions------
+1. Return a dictionary with a single key "code"
+2. The value of "code" should be another dictionary where:
+   - Keys: Full file paths as specified in the architecture design
+   - Values: Complete, implemented content for each file
+3. Ensure all files mentioned in the architecture design are included
+4. Be sure to include the following:
+   - README.md in the root directory with complete documentation
+   - example_usage.sh in the "examples" directory with working examples that are consistent with the PRD
+   - if the PRD or architecture design call for other files to be in the "examples" directory then include them as well
+5. Implement all necessary code files with full, working implementations
+6. Include any CSV/JSON files mentioned in the PRD or architecture design
+7. Ensure the code is production-ready and follows best practices
 """
 
 
@@ -255,16 +269,16 @@ Please verify if the architectural design described in the text representation b
 {architecture_design}
 ```
 
-is accurately mirrored in the documents below. There should be one key for each file in the architecture design.
+is accurately mirrored in the documents below. There should be one name for each file in the architecture design.
 
 ```
 {code}
 ```
 
 Your task is to return a dictionary with two keys:
-- `"approved"`: A boolean indicating whether the hierarchical mapping is correct.
+- `"implementation"`: A boolean indicating whether the hierarchical mapping is correct.
 - `"message"`: A descriptive confirmation message. If the document names do not agree with the architecture_design
-(which is the source of truth) write a prompt instructing what the discrepancy is.
+(which is the source of truth) write a prompt saying what the previous implementation did incorrectly and how it should fixed.
 
 Your analysis and response will help ensure consistency and correctness between the architecture_design 
 and its representation in code.

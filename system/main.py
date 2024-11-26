@@ -3,8 +3,8 @@ import os
 import logging
 from langsmith import utils
 from langchain_core.messages import HumanMessage
-from graph import build_graph
-from prompts import SAMPLE_PRD, DESIGN_PROMPT
+from system.graph import build_graph
+from system.prompts import SAMPLE_PRD, DESIGN_PROMPT
 import argparse
 
 
@@ -27,7 +27,7 @@ def main():
             prd_content = prd_file.read()
 
     graph = build_graph()
-    graph.get_graph().draw_mermaid_png(output_file_path="images/swegraph.png")
+    #graph.get_graph().draw_mermaid_png(output_file_path="system/images/swegraph.png")
     state = {'documents': {'PRD': prd_content},
              'messages': [HumanMessage(content=DESIGN_PROMPT.format(PRD=prd_content))]}
     final_state = graph.invoke(state)
