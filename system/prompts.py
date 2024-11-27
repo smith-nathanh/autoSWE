@@ -97,7 +97,7 @@ Based on the specifications outlined in the PRD document, return a dictionary wi
 2. UML_sequence: A Mermaid 11 sequence diagram showing the key interactions and flow between components as specified in the PRD
 3. architecture_design: A detailed text based representation of the file tree that is true to the PRD and includes but is not limited to:
   - A root-level README.md file documenting the system overview
-  - An 'examples' directory containing:
+  - An 'examples' directory (inside the root directory) containing:
     - example_usage.sh demonstrating core functionality along with any additional example files that align with use cases mentioned in the PRD
 """
 
@@ -255,21 +255,25 @@ architecture_design.md
    - README.md in the root directory with complete documentation
    - example_usage.sh in the "examples" directory with working examples that are consistent with the PRD
    - if the PRD or architecture design call for other files to be in the "examples" directory then include them as well
-5. Implement all necessary code files with full, working implementations
+5. Implement all necessary code files with full, working implementations, don't specify empty directories
 6. Include any CSV/JSON files mentioned in the PRD or architecture design
-7. Ensure the code is production-ready and follows best practices
+7. Ensure the code is production-ready and follows best practices 
+8. Tests will be run from the root directory of the repository so keep that in mind for import statements
 """
 
 
 APPROVE_IMPLEMENTATION_PROMPT = """
 
-Please verify if the architectural design described in the text representation below:
+Below is the architectural design:
 
 ```
 {architecture_design}
 ```
 
-is accurately mirrored in the documents below. There should be one name for each file in the architecture design.
+Please verify that the architecture design is accurately mirrored in the document list below. Each file path in the architecture design should have a corresponding file in the documents list, with the following exceptions:
+- Directories that only contain image files (e.g., .jpg, .png, etc.)
+- Empty directories that are intended as storage locations
+- Non-text based files since the LLM cannot generate them
 
 ```
 {code}
@@ -328,7 +332,7 @@ Code
 -----Instructions--------
 Your task is to generate unit tests to ensure the software adheres to the requirements in the PRD. 
 Pay close attention to the code and the PRD to ensure the tests are comprehensive and accurate.
-The unit tests will be written using the unittest module and ultimately written to a file at: tests/unit/test_module.py. Keep this in mind.
+The unit tests will be written using the unittest module and ultimately written to a file at: tests/unit/test_module.py. Keep this in mind for relative imports and file paths.
 Write the content of the unit tests to a dictionary where the key is "test_module" and the value is the content of the unit test.
 Make another key in this dictionary called "command" and write the command to run the unit tests as the value for the "command" key.
 Nest this dictionary in another dictionary with the key "unit_tests" and return this nested dictionary.

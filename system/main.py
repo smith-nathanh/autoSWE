@@ -27,7 +27,7 @@ def main():
             prd_content = prd_file.read()
 
     graph = build_graph()
-    #graph.get_graph().draw_mermaid_png(output_file_path="system/images/swegraph.png")
+    graph.get_graph().draw_mermaid_png(output_file_path="system/images/swegraph.png")
     state = {'documents': {'PRD': prd_content},
              'messages': [HumanMessage(content=DESIGN_PROMPT.format(PRD=prd_content))]}
     final_state = graph.invoke(state)

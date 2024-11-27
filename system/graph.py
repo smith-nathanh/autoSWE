@@ -228,21 +228,29 @@ def unit_tests(state: GraphState):
     Generate unit tests for the software.
     """
     logging.info("---UNIT TESTS---")
+    state['approvals']['unit_tests_iter'] = state['approvals'].get('unit_tests_iter', 0) + 1
+    
     code = '\n\n'.join(f"# ---{filename}---\n{content}" 
                        for filename, content in state['documents']['code'].items())
-    prompt = UNIT_TEST_PROMPT.format(PRD=state["documents"]['PRD'],
+    prompt = [HumanMessage(content=UNIT_TEST_PROMPT.format(PRD=state["documents"]['PRD'],
                                            architecture_design=state["documents"]['architecture_design'],
-                                           code=code)
+                                           code=code))]
+    if 'unit_tests' in state['approvals']:
+        if not state['approvals']['unit_tests_coverage']:
+            prompt.append(state['messages'][-1])
     structured_llm = llm.with_structured_output(UnitTests)
-    test = structured_llm.invoke([HumanMessage(content=prompt)])
+    test = structured_llm.invoke(prompt)
     state["documents"].update(test.dict())
     return state
 
 def approve_unit_tests(state: GraphState):
     logging.info("---APPROVE UNIT TESTS---")
-    
+
+    # Get first directory name, handling paths with leading slash
+    root_dir = next(name for name in next(iter(state['documents']['code'])).split('/') if name)
+    cmd = f"cd temp/{root_dir} && {state['documents']['unit_tests']['command'].replace('python ', 'coverage run ')}"
+
     try:
-        cmd = f"cd temp && {state['documents']['unit_tests']['command']}"
         # Run command in shell, capture output
         process = subprocess.run(
             cmd,
@@ -253,27 +261,68 @@ def approve_unit_tests(state: GraphState):
         )
         
         # Add command to messages
-        state['messages'].append(state['documents']['unit_tests']['command'])
+        state['messages'].append(cmd)
         
         # Check return code
         if process.returncode == 0:
             state['approvals'].update({"unit_tests": True})
-            state['messages'].append("Unit tests passed")
+            state['messages'].append(f"Unit tests passed: {process.stdout}")
         else:
             state['approvals'].update({"unit_tests": False})
-            state['messages'].append(f"Acceptance tests failed: {process.stderr}")
+            state['messages'].append(f"Unit tests failed: {process.stderr}")
+        
+        # Run coverage report
+        coverage_cmd = f"cd temp/{root_dir} && coverage report"
+        coverage_process = subprocess.run(
+            coverage_cmd,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        # Add coverage command to messages
+        state['messages'].append(coverage_cmd)
+        
+        if coverage_process.returncode == 0:
+            # Parse coverage report output
+            coverage_output = coverage_process.stdout
+            #state['messages'].append(coverage_output)
+            
+            # Extract total coverage percentage
+            for line in coverage_output.splitlines():
+                if line.startswith("TOTAL"):
+                    total_coverage = int(line.split()[3].replace('%', ''))
+                    if total_coverage < 60:
+                        state['approvals'].update({"unit_tests_coverage": False})
+                        msg = f"Coverage report failed to cover at least 60% please revise unit tests: \n{coverage_output}"
+                        state['messages'].append(msg)
+                        logging.info(msg)
+                    else:
+                        state['approvals'].update({"unit_tests_coverage": True})
+                        msg = f"Coverage report successful: \n{coverage_output}"
+                        state['messages'].append(msg)
+                        logging.info(msg)
+                    break
+        else:
+            msg = f"Coverage report failed execution: {coverage_process.stdout}"
+            state['messages'].append(msg)
+            logging.info(msg)
+            state['approvals'].update({"unit_tests_coverage": False})
             
     except Exception as e:
-        state['approvals'].update({"unit_tests": False})
-        state['messages'].append(f"Error running unit tests: {str(e)}")
+        state['approvals'].update({"unit_tests": False, "unit_tests_coverage": False})
+        msg = f"Error running unit tests: {str(e)}"
+        state['messages'].append(msg)
+        logging.info(msg)
         
     return state
 
-def route_unit_tests(state: GraphState) -> Literal["__end__", 'assistant']:
-    if all(state["approvals"].values()):
+def route_unit_tests(state: GraphState) -> Literal["__end__", 'unit_tests']:
+    if state['approvals']['unit_tests_coverage'] or state['approvals']['unit_tests_iter'] > 2:
         return END
     else:
-        return "assistant" # go back to implementation with a message from the controller
+        return "unit_tests" # go back and regenerate unit tests
 
 def environment_setup(state: GraphState):
     """
@@ -349,6 +398,6 @@ def build_graph():
     graph.add_edge('unit_tests', "environment_setup")
     graph.add_edge("environment_setup", "approve_acceptance_tests")
     graph.add_edge("approve_acceptance_tests", "approve_unit_tests")
-    graph.add_edge("approve_unit_tests", END)
+    graph.add_conditional_edges("approve_unit_tests", route_unit_tests)
 
     return graph.compile()

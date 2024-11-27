@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import os
+import shutil
 import copy
 from typing import Dict, List, Union
 
@@ -58,13 +59,26 @@ def write_files(base_path: str, files_content: Dict[str, str]) -> None:
 
 def create_repository(base_path: str, documents: Dict) -> None:
     """Create repository structure and write files including test files"""
-    # Create base directory
+    # Create base directory if it doesn't exist
     os.makedirs(base_path, exist_ok=True)
+
+    # If base_path exists, delete all its contents
+    for filename in os.listdir(base_path):
+        file_path = os.path.join(base_path, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print(f'Failed to delete {file_path}. Reason: {e}')
 
     files = copy.deepcopy(documents['code'])
 
     # Get first directory name, handling paths with leading slash
     root_dir = next(name for name in next(iter(files)).split('/') if name)
+    
+    coverage = "[run]\nomit =\n    */__init__.py\n    tests/*\n"
     
     files.update({
         f'{root_dir}/tests/unit/test_module.py': documents['unit_tests']['test_module'],
@@ -75,6 +89,8 @@ def create_repository(base_path: str, documents: Dict) -> None:
         f'{root_dir}/docs/UML_class.md': documents['UML_class'],
         f'{root_dir}/docs/UML_sequence.md': documents['UML_sequence'],
         f'{root_dir}/docs/architecture_design.md': documents['architecture_design'],
+        f'{root_dir}/requirements.txt': documents['requirements'],
+        f'{root_dir}/.coveragerc': coverage,
     })
     
     # Write files  

@@ -18,6 +18,8 @@ def relocate_directory(temp_dir: str, dest_dir: str, new_name: str) -> None:
             for file in os.listdir(os.path.join(temp_dir, directory)):
                 shutil.move(os.path.join(temp_dir, directory, file), os.path.join(new_path, file))
 
+    os.rmdir(os.path.join(temp_dir, directory))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Relocate and rename a directory")
