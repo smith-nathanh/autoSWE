@@ -282,7 +282,8 @@ Please verify that the architecture design is accurately mirrored in the documen
 Your task is to return a dictionary with two keys:
 - `"implementation"`: A boolean indicating whether the hierarchical mapping is correct.
 - `"message"`: A descriptive confirmation message. If the document names do not agree with the architecture_design
-(which is the source of truth) write a prompt saying what the previous implementation did incorrectly and how it should fixed.
+(which is the source of truth) write a prompt saying what the previous implementation did incorrectly and how it should fixed. 
+Say something like "The previous implementation did not correctly map the architecture_design to the documents. Here's how it should be fixed: ..."
 
 Your analysis and response will help ensure consistency and correctness between the architecture_design 
 and its representation in code.

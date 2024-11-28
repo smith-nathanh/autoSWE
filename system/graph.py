@@ -104,14 +104,14 @@ def software_design(state: GraphState):
     Designs the markdown files for the software design.
     """
     logging.info("---SOFTWARE DESIGN---")
-    #if "approvals" in state:
-    #    if not all(state['approvals'].values()): # this implies that we are back at this node after a rejection
-    #        assistant(state)
-    prompt = deepcopy(state['messages'])
+    prompt = state['messages']
     if 'approvals' in state:
         if not all(state["approvals"].values()):
-            prompt = [HumanMessage(content=DESIGN_PROMPT.format(PRD=state["documents"]['PRD']))]
-            prompt.append(state['messages'][-1]) # add the message from the approver
+            prompt = [
+            SystemMessage(content="You are a helpful assistant. Generate improved content based on the original request and reviewer feedback."),
+            HumanMessage(content=DESIGN_PROMPT.format(PRD=state["documents"]['PRD'])),
+            HumanMessage(content=f"Your previous response needed improvement. Here's the reviewer feedback:\n{state['messages'][-1].content}\n\nPlease generate an improved version addressing these specific issues.")
+            ]
     structured_llm = llm.with_structured_output(Design)
     response = structured_llm.invoke(prompt)
     state["documents"].update(response.dict())
@@ -146,7 +146,11 @@ def implementation(state: GraphState):
     prompt = [HumanMessage(content=IMPLEMENTATION_PROMPT.format(**state["documents"]))]
     if 'implementation' in state['approvals']:
         if not state['approvals']['implementation']:
-            prompt.append(state['messages'][-1]) # add the message from the approver
+            prompt = [
+            SystemMessage(content="You are a helpful assistant. Generate improved content based on the original request and reviewer feedback."),
+            prompt[-1],
+            HumanMessage(content=f"Your previous response needed improvement. Here's the reviewer feedback:\n{state['messages'][-1].content}\n\nPlease generate an improved version addressing these specific issues.")
+            ]
     structured_llm = llm.with_structured_output(Implementation)
     code = structured_llm.invoke(prompt)
     state["messages"].append(prompt)
@@ -196,7 +200,7 @@ def approve_acceptance_tests(state: GraphState):
             cmd,
             shell=True,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True
         )
         
@@ -206,10 +210,10 @@ def approve_acceptance_tests(state: GraphState):
         # Check return code
         if process.returncode == 0:
             state['approvals'].update({"acceptance_tests": True})
-            state['messages'].append("Acceptance tests passed")
+            state['messages'].append(f"Acceptance tests passed: \n{process.stdout}")
         else:
             state['approvals'].update({"acceptance_tests": False})
-            state['messages'].append(f"Acceptance tests failed: {process.stderr}")
+            state['messages'].append(f"Acceptance tests failed: \n{process.stdout}")
             
     except Exception as e:
         state['approvals'].update({"acceptance_tests": False})
@@ -237,7 +241,11 @@ def unit_tests(state: GraphState):
                                            code=code))]
     if 'unit_tests' in state['approvals']:
         if not state['approvals']['unit_tests_coverage']:
-            prompt.append(state['messages'][-1])
+            prompt = [
+            SystemMessage(content="You are a helpful assistant. Generate improved content based on the original request and reviewer feedback."),
+            prompt[-1],
+            HumanMessage(content=f"Your previous response needed improvement. Here's the reviewer feedback:\n{state['messages'][-1]}\n\nPlease generate an improved version addressing these specific issues.")
+            ]
     structured_llm = llm.with_structured_output(UnitTests)
     test = structured_llm.invoke(prompt)
     state["documents"].update(test.dict())
@@ -256,7 +264,7 @@ def approve_unit_tests(state: GraphState):
             cmd,
             shell=True,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True
         )
         
@@ -266,10 +274,10 @@ def approve_unit_tests(state: GraphState):
         # Check return code
         if process.returncode == 0:
             state['approvals'].update({"unit_tests": True})
-            state['messages'].append(f"Unit tests passed: {process.stdout}")
+            state['messages'].append(f"Unit tests passed: \n{process.stdout}")
         else:
             state['approvals'].update({"unit_tests": False})
-            state['messages'].append(f"Unit tests failed: {process.stderr}")
+            state['messages'].append(f"Unit tests failed: \n{process.stdout}")
         
         # Run coverage report
         coverage_cmd = f"cd temp/{root_dir} && coverage report"
@@ -277,7 +285,7 @@ def approve_unit_tests(state: GraphState):
             coverage_cmd,
             shell=True,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True
         )
         
@@ -295,7 +303,7 @@ def approve_unit_tests(state: GraphState):
                     total_coverage = int(line.split()[3].replace('%', ''))
                     if total_coverage < 60:
                         state['approvals'].update({"unit_tests_coverage": False})
-                        msg = f"Coverage report failed to cover at least 60% please revise unit tests: \n{coverage_output}"
+                        msg = f"Unit tests failed to cover at least 60% please revise unit tests: \n{coverage_output}"
                         state['messages'].append(msg)
                         logging.info(msg)
                     else:
@@ -353,15 +361,6 @@ def environment_setup(state: GraphState):
         raise e
 
     return state
-
-# def approve_environment_setup(state: GraphState):
-#     """
-#     Test the requirements.txt file.
-#     """
-#     logging.info("---APPROVE ENVIRONMENT SETUP---")
-#     # need a shell to run the requirements.txt file and see if it works
-#     state['approvals'].update({"requirements": True})
-#     return state
 
 def route_environment_setup(state: GraphState) -> Literal['approve_acceptance_tests', 'environment_setup']:
     if all(state["approvals"].values()):

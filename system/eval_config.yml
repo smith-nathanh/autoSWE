@@ -28,8 +28,8 @@ tracker_v3:
   geotext: 1
   hone: 1
   Hybrid_Images: 4 # change the approve implementation prompt
-  lice: 
-  particle_swarm_optimization: 
-  readtime:
-  stocktrends:
-  TextCNN:
+  lice: 6 # change the approve implementation prompt with feedback message
+  particle_swarm_optimization: 2 # had an error on unit test feedback string object doesn't have content attrib
+  readtime: 1
+  stocktrends: 1
+  TextCNN: 1
