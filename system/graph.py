@@ -374,12 +374,9 @@ def build_graph():
     graph = StateGraph(GraphState)
 
     # nodes
-    #graph.add_node('tools', ToolNode([view_document, update_document, add_document, delete_document]))
-    #graph.add_node("assistant", assistant)
     graph.add_node("software_design", software_design)
     graph.add_node("approve_software_design", approve_software_design)
     graph.add_node("environment_setup", environment_setup)
-    #graph.add_node("approve_environment_setup", approve_environment_setup)
     graph.add_node("implementation", implementation)
     graph.add_node("approve_implementation", approve_implementation)
     graph.add_node("acceptance_tests", acceptance_tests)

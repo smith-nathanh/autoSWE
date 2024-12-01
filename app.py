@@ -61,6 +61,9 @@ def generate_artifacts(prd_file_path):
         final_state = graph.invoke(state)
         logging.info("Artifact generation completed")
         
+        # Add delay before returning
+        time.sleep(5)  # Pause for 5 seconds
+        
         # Map the final state to our web display structure
         artifacts = {
             'prd': final_state['documents'].get('PRD', ''),
