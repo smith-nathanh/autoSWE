@@ -5,6 +5,17 @@ import shutil
 import copy
 from typing import Dict, List, Union
 
+def get_root_dir(files: Dict[str, str]) -> str:
+    # Check if all filenames have the same root directory
+    root_dirs = {filename.split('/')[0] for filename in files.keys()}
+    
+    if len(root_dirs) > 1:
+        # Multiple different root dirs found implying that a root directory was never specified
+        return ""
+    else:
+        # All files have same root dir
+        return next(iter(root_dirs)) + '/' if root_dirs else ""
+
 def check_and_install_packages(packages: List[str]) -> Dict[str, Dict[str, Union[bool, str]]]:
     """Check if packages are installed and install if needed"""
     results = {}
@@ -43,13 +54,9 @@ def check_and_install_packages(packages: List[str]) -> Dict[str, Dict[str, Union
     
     return results
 
-def write_files(base_path: str, files_content: Dict[str, str]) -> None:
-    """Write files based on dictionary input"""
-    for file_path, content in files_content.items():
-        # Strip leading slash to ensure relative path
-        clean_path = file_path.lstrip('/')
-        full_path = os.path.join(base_path, clean_path)
-        
+def write_files(base_path: str, files: Dict[str, str]) -> None:
+    for filename, content in files.items():
+        full_path = os.path.join(base_path, filename)
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(full_path), exist_ok=True)
         
@@ -75,29 +82,25 @@ def create_repository(base_path: str, documents: Dict) -> None:
 
     files = copy.deepcopy(documents['code'])
 
-    # Get first directory name, handling paths with leading slash
-    root_dir = next(name for name in next(iter(files)).split('/') if name)
-    
+    root_dir = get_root_dir(files)
+
     coverage = "[run]\nomit =\n    */__init__.py\n    tests/*\n"
-    
+
     files.update({
-        f'{root_dir}/tests/unit/test_module.py': documents['unit_tests']['test_module'],
-        f'{root_dir}/tests/unit/__init__.py': '',
-        f'{root_dir}/tests/acceptance/test_features.py': documents['acceptance_tests']['test_features'],
-        f'{root_dir}/tests/acceptance/__init__.py': '',
-        f'{root_dir}/docs/PRD.md': documents['PRD'],
-        f'{root_dir}/docs/UML_class.md': documents['UML_class'],
-        f'{root_dir}/docs/UML_sequence.md': documents['UML_sequence'],
-        f'{root_dir}/docs/architecture_design.md': documents['architecture_design'],
-        f'{root_dir}/requirements.txt': documents['requirements'],
-        f'{root_dir}/.coveragerc': coverage,
+        f'{root_dir}tests/unit/test_module.py': documents['unit_tests']['test_module'],
+        f'{root_dir}tests/unit/__init__.py': '',
+        f'{root_dir}tests/acceptance/test_features.py': documents['acceptance_tests']['test_features'],
+        f'{root_dir}tests/acceptance/__init__.py': '',
+        f'{root_dir}docs/PRD.md': documents['PRD'],
+        f'{root_dir}docs/UML_class.md': documents['UML_class'],
+        f'{root_dir}docs/UML_sequence.md': documents['UML_sequence'],
+        f'{root_dir}docs/architecture_design.md': documents['architecture_design'],
+        f'{root_dir}requirements.txt': documents['requirements'],
+        f'{root_dir}.coveragerc': coverage,
     })
-    
-    # Write files  
+
+    # Write files
     write_files(base_path, files)
-
-
-
 
 # Example usage
 if __name__ == "__main__":

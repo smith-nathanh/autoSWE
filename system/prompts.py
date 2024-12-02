@@ -92,13 +92,32 @@ PRD
 
 -----Instructions------
 Using the PRD as a source of truth and guideline, I am going to ask you to generate some specific artifacts.
+Do not suggest in your design that we should import a package that already does the things in the PRD. I want to generate code that performs the things outlined in the PRD from scratch.
 Based on the specifications outlined in the PRD document, return a dictionary with the following keys:
 1. UML_class: A Mermaid 11 class diagram that reflects the class structure and relationships defined in the PRD
 2. UML_sequence: A Mermaid 11 sequence diagram showing the key interactions and flow between components as specified in the PRD
-3. architecture_design: A detailed text based representation of the file tree that is true to the PRD and includes but is not limited to:
-  - A root-level README.md file documenting the system overview
+3. architecture_design: A detailed text based representation of the file tree (with all files and folders under a root directory "project-root") that is true to the PRD and includes but is not limited to:
+  - A README.md file documenting the system overview
   - An 'examples' directory (inside the root directory) containing:
     - example_usage.sh demonstrating core functionality along with any additional example files that align with use cases mentioned in the PRD
+  - Every single file and directory MUST be connected with ASCII lines:
+   - Vertical lines: │
+   - Branch lines: ├───
+   - Last item lines: └───
+   - Each item must have a horizontal line (───) connecting to it
+  - The directory structure must be clear with proper ASCII connection lines like this example:
+project-root/
+├── README.md
+├── src/
+│   ├── __init__.py
+│   ├── main.py
+│   └── utils/
+│       ├── __init__.py
+│       ├── helpers.py
+│       └── config.py
+└── tests/
+    ├── __init__.py
+    └── test_main.py
 """
 
 APPROVE_DESIGN_PROMPT = """
@@ -246,6 +265,22 @@ architecture_design.md
 
 
 -----Instructions------
+Your task is to implement the software based on the PRD and architecture design.
+1. Return a dictionary with one key "code" and the value should be another dictionary where:
+  - Each key is a full file path as specified in the architecture design
+  - Each value is the content of that file
+2. Follow the architecture design precisely
+3. Include all necessary files from the design, including __init__.py files
+4. Keep file paths consistent with this structure throughout your implementation
+5. Implement all code files with full, working implementations do not use placeholders such as "TODO" or "pass"
+6. Don't specify empty directories
+7. Include and generate any CSV/JSON files mentioned in the PRD or architecture design if they are necessary
+8. Ensure the code is production-ready and follows best practices 
+9. Tests will be run from the root directory of the repository so keep that in mind for import statements
+10. Do not import a package that already does the things in the PRD. I want you to generate code that performs the things outlined in the PRD from scratch.
+"""
+
+other_imp = """
 1. Return a dictionary with a single key "code"
 2. The value of "code" should be another dictionary where:
    - Keys: Full file paths as specified in the architecture design
@@ -255,12 +290,12 @@ architecture_design.md
    - README.md in the root directory with complete documentation
    - example_usage.sh in the "examples" directory with working examples that are consistent with the PRD
    - if the PRD or architecture design call for other files to be in the "examples" directory then include them as well
-5. Implement all necessary code files with full, working implementations, don't specify empty directories
-6. Include any CSV/JSON files mentioned in the PRD or architecture design
-7. Ensure the code is production-ready and follows best practices 
-8. Tests will be run from the root directory of the repository so keep that in mind for import statements
+5. Implement all code files with full, working implementations
+6. Don't specify empty directories
+7. Include any CSV/JSON files mentioned in the PRD or architecture design
+8. Ensure the code is production-ready and follows best practices 
+9. Tests will be run from the root directory of the repository so keep that in mind for import statements
 """
-
 
 APPROVE_IMPLEMENTATION_PROMPT = """
 
@@ -284,6 +319,7 @@ Your task is to return a dictionary with two keys:
 - `"message"`: A descriptive confirmation message. If the document names do not agree with the architecture_design
 (which is the source of truth) write a prompt saying what the previous implementation did incorrectly and how it should fixed. 
 Say something like "The previous implementation did not correctly map the architecture_design to the documents. Here's how it should be fixed: ..."
+Also, if there were any issues with the implementation include a reminder not to generate placeholders like "TODO" or "pass" in the code, but to provide full implementations.
 
 Your analysis and response will help ensure consistency and correctness between the architecture_design 
 and its representation in code.
@@ -331,10 +367,55 @@ Code
 
 
 -----Instructions--------
-Your task is to generate unit tests to ensure the software adheres to the requirements in the PRD. 
-Pay close attention to the code and the PRD to ensure the tests are comprehensive and accurate.
-The unit tests will be written using the unittest module and ultimately written to a file at: tests/unit/test_module.py. Keep this in mind for relative imports and file paths.
-Write the content of the unit tests to a dictionary where the key is "test_module" and the value is the content of the unit test.
-Make another key in this dictionary called "command" and write the command to run the unit tests as the value for the "command" key.
-Nest this dictionary in another dictionary with the key "unit_tests" and return this nested dictionary.
+Your task is to generate unit tests to ensure the software adheres to the requirements in the PRD.
+
+Write the content of the unit tests to a dictionary where the key is "test_module" and the value is the content of the unit tests.
+Make another key in this dictionary called "command" and write the command to run the unit test as the value for the "command" key.
+Nest this dictionary in another dictionary with the key "unit_tests" and return this nested dictionary as your response.
+
+Requirements:
+1. The test_module must contain complete unittest code that tests all functionality
+2. Your tests should achieve at least 60 percent coverage
+3. Tests will be written to tests/unit/test_module.py - keep this in mind for imports
+4. Use the unittest module for all tests
+5. Include assertions for both expected and error cases
+"""
+
+UNIT_TEST_REVISION_SYSTEM = """
+You are a Python unittest expert. Your task is to improve the test coverage of the previous unittest implementation.
+"""
+
+UNIT_TEST_REVISION_FEEDBACK = """
+The previous tests had insufficient coverage (below 60%). 
+Your task is to generate improved tests with better coverage.
+
+To improve coverage, make sure to:
+1. Add tests for edge cases (empty inputs, invalid inputs, boundary values)
+2. Add tests for error conditions (exceptions, error handling)
+3. Test all code paths (different branches, conditional logic)
+4. Include more assertions per test case
+5. Test both positive and negative scenarios
+6. Add tests for any missing functionality
+
+Previous feedback for reference: {feedback}
+
+Remember: 
+- Keep using the unittest framework
+- Tests will be written to tests/unit/test_module.py
+- Make sure your response is a properly formatted dictionary
+- Include all necessary imports and test classes in the test_module value
+
+Write the content of the unit tests to a dictionary where the key is "test_module" and the value is the content of the unit tests.
+Make another key in this dictionary called "command" and write the command to run the unit test as the value for the "command" key.
+Nest this dictionary in another dictionary with the key "unit_tests" and return this nested dictionary as your response.
+"""
+
+otherstring = """
+-----Instructions--------
+Your task is to generate unit tests to ensure the software adheres to the requirements in the PRD.
+1. Return a dictionary with one key "unit_tests" and the value should be another dictionary where:
+  - The value of the key "test_module" should be the content of the unit test written in the unittest module
+  - The value of the key "command" should be the command to run the unit tests
+2. Pay close attention to the code and the PRD to ensure the tests are comprehensive and accurate.
+3. The unit tests should be written using the unittest module and ultimately written to a file at: tests/unit/test_module.py. Keep this in mind for relative imports and file paths.
 """

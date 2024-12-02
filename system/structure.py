@@ -34,10 +34,22 @@ class ApproveImplementation(BaseModel):
     message: str
 
 class AcceptanceTests(BaseModel):
-    acceptance_tests: Dict[str, str]
+    acceptance_tests: Dict[str, str] = Field(
+        description="Dictionary containing acceptance test content and command",
+        example={
+            "test_features": "import unittest\n...",
+            "command": "python -m unittest tests/acceptance/test_features.py"
+        }
+    )
 
 class UnitTests(BaseModel):
-    unit_tests: Dict[str, str]
+    unit_tests: Dict[str, str] = Field(
+        description="Dictionary containing test_module and command keys",
+        example={
+            "test_module": "import unittest\nclass TestExample(unittest.TestCase):\n    def test_something(self):\n        pass",
+            "command": "python -m unittest tests/unit/test_module.py"
+        }
+    )
 
 class UpdateDocument(BaseModel):
     content: str

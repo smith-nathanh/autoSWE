@@ -7,7 +7,7 @@ import logging
 from copy import deepcopy
 from langchain_openai import ChatOpenAI
 import subprocess
-from system.utils import check_and_install_packages, create_repository
+from system.utils import check_and_install_packages, create_repository, get_root_dir
 from system.structure import (GraphState, 
                        Design, 
                        ApproveDesign, 
@@ -110,7 +110,7 @@ def software_design(state: GraphState):
             prompt = [
             SystemMessage(content="You are a helpful assistant. Generate improved content based on the original request and reviewer feedback."),
             HumanMessage(content=DESIGN_PROMPT.format(PRD=state["documents"]['PRD'])),
-            HumanMessage(content=f"Your previous response needed improvement. Here's the reviewer feedback:\n{state['messages'][-1].content}\n\nPlease generate an improved version addressing these specific issues.")
+            HumanMessage(content=f"Your previous response needed improvement. Here's the reviewer feedback:\n{state['messages'][-1]}\n\nPlease generate an improved version addressing these specific issues.")
             ]
     structured_llm = llm.with_structured_output(Design)
     response = structured_llm.invoke(prompt)
@@ -143,6 +143,7 @@ def implementation(state: GraphState):
     Implement the software design.
     """
     logging.info("---IMPLEMENTATION---")
+    state['approvals']['implementation_iter'] = state['approvals'].get('implementation_iter', 0) + 1
     prompt = [HumanMessage(content=IMPLEMENTATION_PROMPT.format(**state["documents"]))]
     if 'implementation' in state['approvals']:
         if not state['approvals']['implementation']:
@@ -169,7 +170,7 @@ def approve_implementation(state: GraphState):
     return state
 
 def route_implementation(state: GraphState) -> Literal['acceptance_tests', 'implementation']:
-    if all(state["approvals"].values()):
+    if all(state["approvals"].values()) or state['approvals']['implementation_iter'] > 2:
         return "acceptance_tests"
     else:
         return "implementation"
@@ -193,7 +194,7 @@ def approve_acceptance_tests(state: GraphState):
     logging.info("---APPROVE ACCEPTANCE TESTS---")
     
     try:
-        root_dir = next(iter(state['documents']['code'])).split('/')[0]
+        root_dir = get_root_dir(state['documents']['code'])
         cmd = f"cd temp/{root_dir} && {state['documents']['acceptance_tests']['command']}"
         # Run command in shell, capture output
         process = subprocess.run(
@@ -236,16 +237,32 @@ def unit_tests(state: GraphState):
     
     code = '\n\n'.join(f"# ---{filename}---\n{content}" 
                        for filename, content in state['documents']['code'].items())
-    prompt = [HumanMessage(content=UNIT_TEST_PROMPT.format(PRD=state["documents"]['PRD'],
-                                           architecture_design=state["documents"]['architecture_design'],
-                                           code=code))]
-    if 'unit_tests' in state['approvals']:
-        if not state['approvals']['unit_tests_coverage']:
-            prompt = [
-            SystemMessage(content="You are a helpful assistant. Generate improved content based on the original request and reviewer feedback."),
-            prompt[-1],
-            HumanMessage(content=f"Your previous response needed improvement. Here's the reviewer feedback:\n{state['messages'][-1]}\n\nPlease generate an improved version addressing these specific issues.")
-            ]
+    # prompt = [HumanMessage(content=UNIT_TEST_PROMPT.format(PRD=state["documents"]['PRD'],
+    #                                        architecture_design=state["documents"]['architecture_design'],
+    #                                        code=code))]
+    # if 'unit_tests' in state['approvals']:
+    #     if not state['approvals']['unit_tests_coverage']:
+    #         prompt = [
+    #         SystemMessage(content="You are a helpful assistant. Generate improved content based on the original request and reviewer feedback."),
+    #         prompt[-1],
+    #         HumanMessage(content=f"Your previous response needed improvement. Here's the reviewer feedback:\n{state['messages'][-1]}\n\nPlease generate an improved version addressing these specific issues.")
+    #         ]
+    base_prompt = UNIT_TEST_PROMPT.format(
+        PRD=state["documents"]['PRD'],
+        architecture_design=state["documents"]['architecture_design'],
+        code=code
+    )
+    
+    if 'unit_tests' in state['approvals'] and not state['approvals']['unit_tests_coverage']:
+        prompt = [
+            SystemMessage(content=UNIT_TEST_REVISION_SYSTEM.format()),
+            HumanMessage(content=base_prompt),
+            HumanMessage(content=UNIT_TEST_REVISION_FEEDBACK.format(
+                feedback=state['messages'][-1]
+            ))
+        ]
+    else:
+        prompt = [HumanMessage(content=base_prompt)]
     structured_llm = llm.with_structured_output(UnitTests)
     test = structured_llm.invoke(prompt)
     state["documents"].update(test.dict())
@@ -255,7 +272,7 @@ def approve_unit_tests(state: GraphState):
     logging.info("---APPROVE UNIT TESTS---")
 
     # Get first directory name, handling paths with leading slash
-    root_dir = next(name for name in next(iter(state['documents']['code'])).split('/') if name)
+    root_dir = get_root_dir(state['documents']['code'])
     cmd = f"cd temp/{root_dir} && {state['documents']['unit_tests']['command'].replace('python ', 'coverage run ')}"
 
     try:
@@ -314,7 +331,7 @@ def approve_unit_tests(state: GraphState):
                     break
         else:
             msg = f"Coverage report failed execution: {coverage_process.stdout}"
-            state['messages'].append(msg)
+            state['messages'].append(msg + process.stdout) # add the unit test output
             logging.info(msg)
             state['approvals'].update({"unit_tests_coverage": False})
             
