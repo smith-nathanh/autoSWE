@@ -1,0 +1,6 @@
+# requirements.txt
+
+pandas
+progressbar2
+six
+requests

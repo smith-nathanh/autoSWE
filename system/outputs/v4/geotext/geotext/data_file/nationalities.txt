@@ -1,0 +1,2 @@
+afghan:AF
+albanian:AL

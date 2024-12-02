@@ -38,10 +38,23 @@ tracker_v4:
   ArXiv_Digest: 1
   chakin: 1 # changed file saving issue not related to LLMs
   geotext: many # revised unit test and implementation prompt iterations
-  hone: 
-  Hybrid_Images: 
-  lice: 
-  particle-swarm-optimization: 
-  readtime: 
-  stocktrends: 
-  TextCNN: 
+  hone: 2 # but issue with saving files / not related to LLMs
+  Hybrid_Images: 1
+  lice: 1 
+  particle-swarm-optimization: 1
+  readtime: 1
+  stocktrends: 1 # had some issues with <<<<< HEAD in the benchmark PRD fixed file and reran
+  TextCNN: 1
+
+
+tracker_v5:
+  ArXiv_Digest: 2
+  chakin: 1
+  geotext: 1
+  hone: 2
+  Hybrid_Images: 1
+  lice: 1
+  particle-swarm-optimization: 1
+  readtime: 1
+  stocktrends: 2
+  TextCNN: 1

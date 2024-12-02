@@ -1,0 +1,343 @@
+messages:
+  - UML class diagram approved
+  - Code approved
+  - Acceptance tests passed
+  - Unit tests passed
+approvals:
+  UML_class: true
+  UML_sequence: true
+  architecture_design: true
+  requirements: true
+  implementation: true
+  acceptance_tests: true
+  unit_tests: true
+documents:
+  PRD: |-
+    # Introduction
+    The project aims to develop a Python-based implementation of Particle Swarm Optimization (PSO). This repository will contain a minimalistic yet functional PSO algorithm designed to offer a clear understanding of the PSO mechanism and its application in optimization problems.
+
+    # Goals
+    The primary goal is to create a Python implementation of the PSO algorithm that is easy to understand and use. It will allow users to apply PSO to various optimization problems, with a focus on simplicity and effectiveness.
+
+    # Features and Functionalities
+    - PSO Implementation:
+        - Ability to specify cost functions for optimization.
+        - Configuration of PSO parameters like the number of particles, maximum iterations, and bounds for the optimization problem.
+        - Verbose output displaying the iteration process and the best solution found at each step.
+    - Cost Function:
+        - Inclusion of example cost functions like the sphere function for demonstration purposes.
+        - Flexibility to use custom cost functions.
+    - Optimization Process:
+        - Detailed output showing the progress of the optimization, including the best solution found in each iteration.
+        - Final output displaying the best solution found and its corresponding value.
+    # Technical Constraints
+    - The PSO implementation should be in Python.
+    - The implementation should focus on clarity and ease of understanding, making it suitable for educational purposes and practical applications.
+    # Requirements
+    ## Dependencies
+    - No specific external libraries required for the basic PSO implementation
+    # Usage
+    To use the PSO algorithm, run the following script:
+    ~~~python
+    python examples/demo.py
+    ~~~
+
+    # Acceptance Criteria
+    - The PSO implementation should successfully optimize the given cost function within the specified bounds.
+    - The output should clearly display the iterative process and the final solution.
+    - The solution found by the PSO implementation should be consistent with the expected results for the given problem.
+  UML_class: |-
+    classDiagram
+        class PSO {
+            - int num_particles
+            - int max_iterations
+            - float[] bounds
+            - Particle[] particles
+            - CostFunction cost_function
+            + PSO(int num_particles, int max_iterations, float[] bounds, CostFunction cost_function)
+            + void optimize()
+            + Particle get_best_solution()
+        }
+
+        class Particle {
+            - float[] position
+            - float[] velocity
+            - float[] best_position
+            - float best_value
+            + Particle(float[] bounds)
+            + void update_velocity(float[] global_best_position)
+            + void update_position()
+            + void evaluate(CostFunction cost_function)
+        }
+
+        class CostFunction {
+            + float evaluate(float[] position)
+        }
+
+        PSO --> Particle
+        PSO --> CostFunction
+        Particle --> CostFunction
+  UML_sequence: |-
+    sequenceDiagram
+        participant User
+        participant PSO
+        participant Particle
+        participant CostFunction
+
+        User->>PSO: Initialize PSO with parameters
+        loop Optimization Process
+            PSO->>Particle: Initialize particles
+            loop For each iteration
+                Particle->>CostFunction: Evaluate cost
+                Particle->>Particle: Update velocity
+                Particle->>Particle: Update position
+                Particle->>PSO: Update personal best
+                PSO->>PSO: Update global best
+            end
+        end
+        PSO->>User: Return best solution
+  architecture_design: |
+    project-root/
+    │
+    ├── pso/
+    │   ├── __init__.py
+    │   ├── pso.py
+    │   ├── particle.py
+    │   └── cost_function.py
+    │
+    ├── examples/
+    │   └── demo.py
+    │
+    └── README.md
+  requirements: unittest
+  code:
+    pso/__init__.py: ""
+    pso/pso.py: |
+      class PSO:
+          def __init__(self, num_particles, max_iterations, bounds, cost_function):
+              self.num_particles = num_particles
+              self.max_iterations = max_iterations
+              self.bounds = bounds
+              self.cost_function = cost_function
+              self.particles = [Particle(bounds) for _ in range(num_particles)]
+              self.global_best_position = None
+              self.global_best_value = float('inf')
+
+          def optimize(self):
+              for _ in range(self.max_iterations):
+                  for particle in self.particles:
+                      particle.evaluate(self.cost_function)
+                      if particle.best_value < self.global_best_value:
+                          self.global_best_value = particle.best_value
+                          self.global_best_position = particle.best_position
+
+                  for particle in self.particles:
+                      particle.update_velocity(self.global_best_position)
+                      particle.update_position()
+
+          def get_best_solution(self):
+              return self.global_best_position, self.global_best_value
+    pso/particle.py: |-
+      class Particle:
+          def __init__(self, bounds):
+              self.position = [random.uniform(b[0], b[1]) for b in bounds]
+              self.velocity = [0.0 for _ in bounds]
+              self.best_position = self.position[:]
+              self.best_value = float('inf')
+
+          def update_velocity(self, global_best_position):
+              inertia_weight = 0.5
+              cognitive_constant = 1.5
+              social_constant = 1.5
+              for i in range(len(self.position)):
+                  r1 = random.random()
+                  r2 = random.random()
+                  cognitive_velocity = cognitive_constant * r1 * (self.best_position[i] - self.position[i])
+                  social_velocity = social_constant * r2 * (global_best_position[i] - self.position[i])
+                  self.velocity[i] = inertia_weight * self.velocity[i] + cognitive_velocity + social_velocity
+
+          def update_position(self):
+              for i in range(len(self.position)):
+                  self.position[i] += self.velocity[i]
+
+          def evaluate(self, cost_function):
+              value = cost_function.evaluate(self.position)
+              if value < self.best_value:
+                  self.best_value = value
+                  self.best_position = self.position[:]
+    pso/cost_function.py: |-
+      class CostFunction:
+          def evaluate(self, position):
+              return sum(x**2 for x in position)  # Example: Sphere function
+    examples/demo.py: |
+      from pso.pso import PSO
+      from pso.cost_function import CostFunction
+
+      if __name__ == "__main__":
+          num_particles = 30
+          max_iterations = 100
+          bounds = [(-10, 10) for _ in range(2)]  # Example for 2D optimization
+          cost_function = CostFunction()
+
+          pso = PSO(num_particles, max_iterations, bounds, cost_function)
+          pso.optimize()
+          best_position, best_value = pso.get_best_solution()
+
+          print(f"Best Position: {best_position}")
+          print(f"Best Value: {best_value}")
+    README.md: |-
+      # Particle Swarm Optimization (PSO) in Python
+
+      This project provides a simple implementation of the Particle Swarm Optimization (PSO) algorithm in Python. The implementation is designed to be easy to understand and use, making it suitable for educational purposes and practical applications.
+
+      ## Features
+      - Configurable number of particles and iterations
+      - Customizable cost function
+      - Verbose output showing the optimization process
+
+      ## Usage
+      To run the PSO algorithm, execute the following command:
+
+      ```bash
+      python examples/demo.py
+      ```
+
+      ## Project Structure
+      - `pso/`: Contains the core implementation of the PSO algorithm.
+        - `pso.py`: Main PSO class.
+        - `particle.py`: Particle class representing each particle in the swarm.
+        - `cost_function.py`: Cost function class for evaluating solutions.
+      - `examples/`: Contains example scripts demonstrating the use of the PSO algorithm.
+        - `demo.py`: Example script to run the PSO algorithm.
+
+      ## Requirements
+      - Python 3.x
+
+      No external libraries are required for the basic PSO implementation.
+
+      ## License
+      This project is licensed under the MIT License.
+  acceptance_tests: |-
+    import unittest
+    from pso.pso import PSO
+    from pso.particle import Particle
+    from pso.cost_function import CostFunction
+
+    class TestPSO(unittest.TestCase):
+        def setUp(self):
+            # Example cost function: Sphere function
+            class SphereFunction(CostFunction):
+                def evaluate(self, position):
+                    return sum(x**2 for x in position)
+
+            self.cost_function = SphereFunction()
+            self.num_particles = 30
+            self.max_iterations = 100
+            self.bounds = [-10, 10]
+            self.pso = PSO(self.num_particles, self.max_iterations, self.bounds, self.cost_function)
+
+        def test_initialization(self):
+            """Test if PSO initializes correctly with given parameters."""
+            self.assertEqual(self.pso.num_particles, self.num_particles)
+            self.assertEqual(self.pso.max_iterations, self.max_iterations)
+            self.assertEqual(self.pso.bounds, self.bounds)
+            self.assertIsInstance(self.pso.cost_function, CostFunction)
+
+        def test_optimization_process(self):
+            """Test the optimization process and ensure it completes without errors."""
+            self.pso.optimize()
+            best_solution = self.pso.get_best_solution()
+            self.assertIsNotNone(best_solution)
+            self.assertIsInstance(best_solution, Particle)
+
+        def test_best_solution(self):
+            """Test if the best solution found is within the expected bounds."""
+            self.pso.optimize()
+            best_solution = self.pso.get_best_solution()
+            for position in best_solution.position:
+                self.assertGreaterEqual(position, self.bounds[0])
+                self.assertLessEqual(position, self.bounds[1])
+
+        def test_output_format(self):
+            """Test if the output format is correct and contains necessary information."""
+            import io
+            import sys
+            captured_output = io.StringIO()          # Create StringIO object
+            sys.stdout = captured_output             # Redirect stdout.
+            self.pso.optimize()
+            sys.stdout = sys.__stdout__              # Reset redirect.
+            output = captured_output.getvalue()
+            self.assertIn("Iteration", output)
+            self.assertIn("Best solution", output)
+
+    if __name__ == '__main__':
+        unittest.main()
+  unit_tests: |-
+    import unittest
+    from pso.pso import PSO
+    from pso.particle import Particle
+    from pso.cost_function import CostFunction
+
+    class TestPSO(unittest.TestCase):
+        def setUp(self):
+            self.num_particles = 10
+            self.max_iterations = 100
+            self.bounds = [(-10, 10)] * 2  # 2D problem
+            self.cost_function = CostFunction()
+            self.pso = PSO(self.num_particles, self.max_iterations, self.bounds, self.cost_function)
+
+        def test_initialization(self):
+            self.assertEqual(self.pso.num_particles, self.num_particles)
+            self.assertEqual(self.pso.max_iterations, self.max_iterations)
+            self.assertEqual(self.pso.bounds, self.bounds)
+            self.assertIsInstance(self.pso.cost_function, CostFunction)
+            self.assertEqual(len(self.pso.particles), self.num_particles)
+
+        def test_optimize(self):
+            self.pso.optimize()
+            best_solution = self.pso.get_best_solution()
+            self.assertIsNotNone(best_solution)
+            self.assertIsInstance(best_solution, Particle)
+
+        def test_get_best_solution(self):
+            self.pso.optimize()
+            best_solution = self.pso.get_best_solution()
+            self.assertIsNotNone(best_solution)
+            self.assertIsInstance(best_solution, Particle)
+
+    class TestParticle(unittest.TestCase):
+        def setUp(self):
+            self.bounds = [(-10, 10)] * 2  # 2D problem
+            self.particle = Particle(self.bounds)
+
+        def test_initialization(self):
+            self.assertEqual(len(self.particle.position), len(self.bounds))
+            self.assertEqual(len(self.particle.velocity), len(self.bounds))
+            self.assertEqual(len(self.particle.best_position), len(self.bounds))
+
+        def test_update_velocity(self):
+            global_best_position = [0, 0]
+            initial_velocity = self.particle.velocity.copy()
+            self.particle.update_velocity(global_best_position)
+            self.assertNotEqual(self.particle.velocity, initial_velocity)
+
+        def test_update_position(self):
+            initial_position = self.particle.position.copy()
+            self.particle.update_position()
+            self.assertNotEqual(self.particle.position, initial_position)
+
+        def test_evaluate(self):
+            cost_function = CostFunction()
+            initial_best_value = self.particle.best_value
+            self.particle.evaluate(cost_function)
+            self.assertNotEqual(self.particle.best_value, initial_best_value)
+
+    class TestCostFunction(unittest.TestCase):
+        def test_evaluate(self):
+            cost_function = CostFunction()
+            position = [0, 0]
+            result = cost_function.evaluate(position)
+            self.assertIsInstance(result, float)
+
+    if __name__ == '__main__':
+        unittest.main()

@@ -1,0 +1,6 @@
+beautifulsoup4
+lxml
+markdown2
+pytest
+pyquery
+unittest

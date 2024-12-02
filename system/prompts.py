@@ -298,6 +298,44 @@ other_imp = """
 """
 
 APPROVE_IMPLEMENTATION_PROMPT = """
+Review the architectural design and implementation documents below to verify their structural consistency.
+
+Architecture Design:
+```
+{architecture_design}
+```
+
+Implementation Documents:
+```
+{code}
+```
+
+Validation Rules:
+- Each file path in the architecture design must have a corresponding implementation file
+- Exceptions:
+  1. Image-only directories (containing .jpg, .png, etc.)
+  2. Empty directories designated for storage
+  3. Non-text based files
+
+Response Format:
+{{
+    "implementation": boolean,  # True if hierarchical mapping is correct
+    "message": string  # Detailed analysis and recommendations
+}}
+
+Message Guidelines:
+- If validation passes: Confirm the correct mapping between design and implementation
+- If validation fails:
+  1. Identify specific mismatches between architecture_design and documents
+  2. Provide clear instructions for necessary corrections
+  3. Include a reminder to implement full functionality instead of placeholders (e.g., "TODO" or "pass")
+
+Example Error Message:
+"The previous implementation did not correctly map the architecture_design to the documents. Here's how it should be fixed: [specific changes needed]. Remember to provide complete implementations rather than using placeholder code."
+"""
+
+
+OLD_APPROVE_IMPLEMENTATION_PROMPT = """
 
 Below is the architectural design:
 

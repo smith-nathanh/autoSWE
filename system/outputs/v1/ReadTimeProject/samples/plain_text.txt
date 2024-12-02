@@ -1,0 +1,3 @@
+This is a sample plain text file. It contains simple text to estimate reading time.
+
+The purpose of this text is to provide content for the reading time calculator to process and estimate how long it would take to read this text based on a given words-per-minute rate.

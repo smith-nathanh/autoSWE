@@ -1,0 +1,3 @@
+# Template for AFL3 License
+
+<Insert AFL3 License Text Here>

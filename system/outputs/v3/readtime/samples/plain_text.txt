@@ -1,0 +1,1 @@
+This is a sample plain text file to test reading time estimation. It contains simple sentences to evaluate the tool's performance.

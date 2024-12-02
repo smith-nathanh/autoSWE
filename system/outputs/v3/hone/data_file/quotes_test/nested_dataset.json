@@ -1,0 +1,15 @@
+[
+    {
+        "some 'quoted\"' field\"": "no quotes",
+        "adopted_since": "2012",
+        "adopted": "TRUE",
+        "birth": {
+            "year": "2011",
+            "month": "April",
+            "day": "11"
+        },
+        "weight (kg)": "3.6",
+        "age (years)": "5",
+        "name": "Tommy"
+    }
+]

@@ -1,0 +1,3 @@
+# Header Template for AGPL3 License
+
+<Insert AGPL3 Header Text Here>

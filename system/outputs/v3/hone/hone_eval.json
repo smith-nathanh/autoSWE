@@ -1,0 +1,54 @@
+{
+    "environment_setup": {
+        "create_conda_env": {
+            "stdout": "Collecting package metadata (repodata.json): ...working... done\nSolving environment: ...working... done\n\n## Package Plan ##\n\n  environment location: C:\\Users\\smith\\Anaconda3\\envs\\myenv\n\n  added / updated specs:\n    - python=3.8\n\n\nThe following NEW packages will be INSTALLED:\n\n  ca-certificates    pkgs/main/win-64::ca-certificates-2024.11.26-haa95532_0\n  libffi             pkgs/main/win-64::libffi-3.4.4-hd77b12b_1\n  openssl            pkgs/main/win-64::openssl-3.0.15-h827c3e9_0\n  pip                pkgs/main/win-64::pip-24.2-py38haa95532_0\n  python             pkgs/main/win-64::python-3.8.20-h8205438_0\n  setuptools         pkgs/main/win-64::setuptools-75.1.0-py38haa95532_0\n  sqlite             pkgs/main/win-64::sqlite-3.45.3-h2bbff1b_0\n  vc                 pkgs/main/win-64::vc-14.40-h2eaa2aa_1\n  vs2015_runtime     pkgs/main/win-64::vs2015_runtime-14.40.33807-h98bb1dd_1\n  wheel              pkgs/main/win-64::wheel-0.44.0-py38haa95532_0\n\n\nPreparing transaction: ...working... done\nVerifying transaction: ...working... done\nExecuting transaction: ...working... done\n#\n# To activate this environment, use\n#\n#     $ conda activate myenv\n#\n# To deactivate an active environment, use\n#\n#     $ conda deactivate\n\n",
+            "stderr": "\n\n==> WARNING: A newer version of conda exists. <==\n  current version: 4.8.2\n  latest version: 24.11.0\n\nPlease update conda by running\n\n    $ conda update -n base -c defaults conda\n\n\n",
+            "returncode": 0
+        },
+        "activate_conda_env": {
+            "stdout": "",
+            "stderr": "",
+            "returncode": 0
+        },
+        "pip_install": {
+            "stdout": "No additional packages to install",
+            "stderr": "",
+            "returncode": 0
+        },
+        "example_usage.sh": [
+            {
+                "command": "python demo.py --csv_filepath ../data_file/comma_test/dataset.csv --json_filepath ../data_file/comma_test/output.json",
+                "result": {
+                    "stdout": "",
+                    "stderr": "ERROR conda.cli.main_run:execute(32): Subprocess for 'conda run ['python', 'demo.py', '--csv_filepath', '../data_file/comma_test/dataset.csv', '--json_filepath', '../data_file/comma_test/output.json']' command failed.  (See above for error)\npython: can't open file 'demo.py': [Errno 2] No such file or directory\n\n",
+                    "returncode": 0
+                }
+            },
+            {
+                "command": "python demo.py --csv_filepath ../data_file/small_cats_dataset/dataset.csv --json_filepath ../data_file/small_cats_dataset/output.json --schema '{\"birth\": {\"year\": \"birth year\", \"month\": \"birth month\", \"day\": \"birth day\"}, \"name\": \"name\", \"age (years)\": \"age (years)\", \"weight (kg)\": \"weight (kg)\", \"adopted\": \"adopted\", \"adopted_since\": \"adopted_since\"}'",
+                "result": {
+                    "stdout": "",
+                    "stderr": "ERROR conda.cli.main_run:execute(32): Subprocess for 'conda run ['python', 'demo.py', '--csv_filepath', '../data_file/small_cats_dataset/dataset.csv', '--json_filepath', '../data_file/small_cats_dataset/output.json', '--schema', \"'{birth:\", '{year:', 'birth year,', 'month:', 'birth month,', 'day:', 'birth day},', 'name:', 'name,', 'age (years):', 'age (years),', 'weight (kg):', 'weight (kg),', 'adopted:', 'adopted,', 'adopted_since:', \"adopted_since}'\"]' command failed.  (See above for error)\npython: can't open file 'demo.py': [Errno 2] No such file or directory\n\n",
+                    "returncode": 0
+                }
+            }
+        ]
+    },
+    "acceptance_tests": {
+        "stdout": "",
+        "stderr": "ERROR conda.cli.main_run:execute(32): Subprocess for 'conda run ['python', '-m', 'unittest', 'tests/acceptance/test_features.py']' command failed.  (See above for error)\nEEE\n\n======================================================================\n\nERROR: test_comma_test_conversion (tests.acceptance.test_features.TestCSVToJSONConversion)\n\n----------------------------------------------------------------------\n\nTraceback (most recent call last):\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\tests\\acceptance\\test_features.py\", line 21, in test_comma_test_conversion\n\n    self.csv_parser.read_csv(csv_file, ',')\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\hone\\csv_parser.py\", line 9, in read_csv\n\n    with open(filepath, mode='r', newline='') as file:\n\nTypeError: expected str, bytes or os.PathLike object, not _io.TextIOWrapper\n\n\n\n======================================================================\n\nERROR: test_quotes_test_conversion (tests.acceptance.test_features.TestCSVToJSONConversion)\n\n----------------------------------------------------------------------\n\nTraceback (most recent call last):\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\tests\\acceptance\\test_features.py\", line 44, in test_quotes_test_conversion\n\n    self.csv_parser.read_csv(csv_file, ',')\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\hone\\csv_parser.py\", line 9, in read_csv\n\n    with open(filepath, mode='r', newline='') as file:\n\nTypeError: expected str, bytes or os.PathLike object, not _io.TextIOWrapper\n\n\n\n======================================================================\n\nERROR: test_small_cats_dataset_conversion_with_schema (tests.acceptance.test_features.TestCSVToJSONConversion)\n\n----------------------------------------------------------------------\n\nTraceback (most recent call last):\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\tests\\acceptance\\test_features.py\", line 71, in test_small_cats_dataset_conversion_with_schema\n\n    self.csv_parser.read_csv(csv_file, ',')\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\hone\\csv_parser.py\", line 9, in read_csv\n\n    with open(filepath, mode='r', newline='') as file:\n\nTypeError: expected str, bytes or os.PathLike object, not _io.TextIOWrapper\n\n\n\n----------------------------------------------------------------------\n\nRan 3 tests in 0.001s\n\n\n\nFAILED (errors=3)\n\n\n",
+        "returncode": 0
+    },
+    "unit_tests": {
+        "run_tests": {
+            "stdout": "",
+            "stderr": "ERROR conda.cli.main_run:execute(32): Subprocess for 'conda run ['coverage', 'run', '-m', 'unittest', 'tests/unit/test_module.py']' command failed.  (See above for error)\nFEE.\n\n======================================================================\n\nERROR: test_convert_to_json_with_schema (tests.unit.test_module.TestJSONGenerator)\n\n----------------------------------------------------------------------\n\nTraceback (most recent call last):\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\tests\\unit\\test_module.py\", line 40, in test_convert_to_json_with_schema\n\n    json_data = self.json_generator.convert_to_json(self.data, self.schema)\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\hone\\json_generator.py\", line 6, in convert_to_json\n\n    return [self._apply_schema(row, schema) for row in data]\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\hone\\json_generator.py\", line 6, in <listcomp>\n\n    return [self._apply_schema(row, schema) for row in data]\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\hone\\json_generator.py\", line 16, in _apply_schema\n\n    json_object[key] = row[self.column_names.index(value)]\n\nAttributeError: 'JSONGenerator' object has no attribute 'column_names'\n\n\n\n======================================================================\n\nERROR: test_convert_to_json_without_schema (tests.unit.test_module.TestJSONGenerator)\n\n----------------------------------------------------------------------\n\nTraceback (most recent call last):\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\tests\\unit\\test_module.py\", line 47, in test_convert_to_json_without_schema\n\n    json_data = self.json_generator.convert_to_json(self.data)\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\hone\\json_generator.py\", line 8, in convert_to_json\n\n    return [dict(zip(self.column_names, row)) for row in data]\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\hone\\json_generator.py\", line 8, in <listcomp>\n\n    return [dict(zip(self.column_names, row)) for row in data]\n\nAttributeError: 'JSONGenerator' object has no attribute 'column_names'\n\n\n\n======================================================================\n\nFAIL: test_read_csv (tests.unit.test_module.TestCSVParser)\n\n----------------------------------------------------------------------\n\nTraceback (most recent call last):\n\n  File \"C:\\Users\\smith\\code\\autoSWE\\system\\outputs\\v3\\hone\\tests\\unit\\test_module.py\", line 17, in test_read_csv\n\n    self.assertEqual(self.csv_parser.extract_column_names(), expected_columns)\n\nAssertionError: Lists differ: ['\"test\",\"ing\", \"beep\"\"\"\"\"\"'] != ['\"test\",\"ing\"', ' \"beep\"\"\"']\n\n\n\nFirst differing element 0:\n\n'\"test\",\"ing\", \"beep\"\"\"\"\"\"'\n\n'\"test\",\"ing\"'\n\n\n\nSecond list contains 1 additional elements.\n\nFirst extra element 1:\n\n' \"beep\"\"\"'\n\n\n\n- ['\"test\",\"ing\", \"beep\"\"\"\"\"\"']\n\n?                         ---\n\n\n\n+ ['\"test\",\"ing\"', ' \"beep\"\"\"']\n\n?               + ++\n\n\n\n\n\n----------------------------------------------------------------------\n\nRan 4 tests in 0.003s\n\n\n\nFAILED (failures=1, errors=2)\n\n\n",
+            "returncode": 0
+        },
+        "coverage_report": {
+            "stdout": "Name                     Stmts   Miss  Cover\n\n--------------------------------------------\n\nhone\\csv_parser.py          14      0   100%\n\nhone\\json_generator.py      16      4    75%\n\nhone\\utilities.py            7      0   100%\n\n--------------------------------------------\n\nTOTAL                       37      4    89%\n\n\n",
+            "stderr": "",
+            "returncode": 0
+        }
+    }
+}

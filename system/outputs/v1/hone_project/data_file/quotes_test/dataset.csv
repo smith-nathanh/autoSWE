@@ -1,0 +1,2 @@
+name,age (years),weight (kg),birth day,birth month,birth year,adopted,adopted_since,"some '"quoted"' field"
+Tommy,5,3.6,11,April,2011,TRUE,2012,no quotes

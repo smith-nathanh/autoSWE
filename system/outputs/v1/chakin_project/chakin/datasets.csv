@@ -1,0 +1,6 @@
+# chakin/datasets.csv
+
+# Example CSV content
+Name,Dimension,Corpus,VocabularySize,Method,Language,Paper,Author,URL
+fastText(ar),300,Wikipedia,610K,fastText,Arabic,Enriching Word Vectors with Subword Information,Facebook,https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.ar.300.vec.gz
+fastText(de),300,Wikipedia,2.3M,fastText,German,Enriching Word Vectors with Subword Information,Facebook,https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.de.300.vec.gz

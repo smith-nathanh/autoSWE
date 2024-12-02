@@ -1,0 +1,544 @@
+messages:
+  - UML class diagram approved
+  - Code approved
+  - Acceptance tests passed
+  - Unit tests passed
+approvals:
+  UML_class: true
+  UML_sequence: true
+  architecture_design: true
+  requirements: true
+  implementation: true
+  acceptance_tests: true
+  unit_tests: true
+documents:
+  PRD: |-
+    # Introduction
+    The purpose of this project is to develop a Python-based tool that can estimate the reading time for various formats of content. This tool will be able to process plain text, HTML, and markdown formats, providing users with an approximate reading time based on a standard or user-defined words-per-minute (WPM) rate.
+
+    # Goals
+    The objective of this project is to create a reliable and versatile reading time calculator. This tool should:
+    - Accurately estimate the reading time for different formats of content.
+    - Be user-friendly and flexible, allowing for different input types and WPM rates.
+
+    # Features and Functionalities
+    The revised features and functionalities, including the test cases based on the provided testing scripts, are as follows:
+
+    - Content Processing:
+        - Ability to process three types of content: plain text, HTML, and markdown.
+        - Ensuring accurate parsing and handling of each content type.
+    - Reading Time Calculation:
+        - Estimating reading time based on content and a specified WPM rate. The default WPM rate is 265.
+        - Providing accurate calculations for different lengths and complexities of text.
+    - Error Handling and Validation:
+        - Appropriate exception handling for unsupported formats.
+        - Validation tests to check the handling of invalid inputs or unsupported content formats.
+
+    # Supporting Data Description
+    The ReadTime project, dedicated to developing a tool for estimating reading time across various content formats, utilizes datasets stored in the `./samples` folder. These datasets are vital for testing and validation:
+
+    **`./samples` Folder:**
+
+    - **`html.html`:**
+      - Contains HTML formatted content.
+      - This file is used to test the tool's ability to process HTML content and accurately estimate reading time.
+
+    - **`markdown.md`:**
+      - Includes content in markdown format.
+      - Essential for validating the tool's capability to parse markdown content and provide a reliable reading time estimate.
+
+    - **`plain_text.txt`:**
+      - A plain text file.
+      - Used to assess the tool's effectiveness in handling plain text and calculating the reading time based on the specified WPM rate.
+
+    Each of these files in the `./samples` folder plays a crucial role in ensuring the functionality and accuracy of the ReadTime project's core feature: estimating reading time for content in plain text, HTML, and markdown formats.
+
+    # Technical Constraints
+    - The tool should be developed in Python 3.x.
+    - ependencies include beautifulsoup4, lxml, markdown2, pytest and pyquery libraries.
+
+    # Requirements
+    ## Dependencies
+    - beautifulsoup4 library
+    - lxml library
+    - markdown2 library
+    - pytest library
+    - pyquery library
+
+    # Usage
+    To estimate reading time, run the following script:
+    ~~~python
+    python examples/demo.py
+    ~~~
+
+    # Acceptance Criteria
+    - The tool should correctly estimate the reading time for provided content in different formats.
+    - The tool should handle different WPM rates, including the default rate.
+    - Proper error handling and messages for unsupported formats.
+  UML_class: |-
+    classDiagram
+        class ReadTimeCalculator {
+            +int default_wpm
+            +estimate_reading_time(content: str, wpm: int) int
+            +process_plain_text(content: str) int
+            +process_html(content: str) int
+            +process_markdown(content: str) int
+        }
+
+        class ContentProcessor {
+            +parse_content(content: str, format: str) str
+        }
+
+        class ErrorHandler {
+            +handle_unsupported_format(format: str)
+            +validate_input(content: str, format: str)
+        }
+
+        ReadTimeCalculator --> ContentProcessor : uses
+        ReadTimeCalculator --> ErrorHandler : uses
+  UML_sequence: |-
+    sequenceDiagram
+        participant User
+        participant DemoScript
+        participant ReadTimeCalculator
+        participant ContentProcessor
+        participant ErrorHandler
+
+        User->>DemoScript: Run demo.py
+        DemoScript->>ReadTimeCalculator: estimate_reading_time(content, wpm)
+        ReadTimeCalculator->>ContentProcessor: parse_content(content, format)
+        ContentProcessor-->>ReadTimeCalculator: parsed content
+        ReadTimeCalculator->>ErrorHandler: validate_input(content, format)
+        ErrorHandler-->>ReadTimeCalculator: validation result
+        alt format supported
+            ReadTimeCalculator->>ReadTimeCalculator: calculate reading time
+        else format not supported
+            ReadTimeCalculator->>ErrorHandler: handle_unsupported_format(format)
+        end
+        ReadTimeCalculator-->>DemoScript: estimated reading time
+        DemoScript-->>User: Display reading time
+  architecture_design: |-
+    ReadTimeProject/
+    │
+    ├── examples/
+    │   └── demo.py
+    │
+    ├── samples/
+    │   ├── html.html
+    │   ├── markdown.md
+    │   └── plain_text.txt
+    │
+    ├── src/
+    │   ├── __init__.py
+    │   ├── read_time_calculator.py
+    │   ├── content_processor.py
+    │   └── error_handler.py
+    │
+    ├── tests/
+    │   ├── __init__.py
+    │   ├── test_read_time_calculator.py
+    │   ├── test_content_processor.py
+    │   └── test_error_handler.py
+    │
+    ├── requirements.txt
+    └── README.md
+  requirements: |-
+    beautifulsoup4
+    lxml
+    markdown2
+    pytest
+    pyquery
+    unittest
+  code:
+    examples/demo.py: |-
+      from src.read_time_calculator import ReadTimeCalculator
+
+      # Sample content for demonstration
+      plain_text_content = "This is a sample plain text to estimate reading time."
+      html_content = "<html><body><p>This is a sample HTML content to estimate reading time.</p></body></html>"
+      markdown_content = "# Sample Markdown\nThis is a sample markdown content to estimate reading time."
+
+      # Create an instance of ReadTimeCalculator
+      calculator = ReadTimeCalculator()
+
+      # Estimate reading time for different content types
+      plain_text_time = calculator.estimate_reading_time(plain_text_content, 265)
+      html_time = calculator.estimate_reading_time(html_content, 265)
+      markdown_time = calculator.estimate_reading_time(markdown_content, 265)
+
+      # Display the estimated reading times
+      print(f"Estimated reading time for plain text: {plain_text_time} minutes")
+      print(f"Estimated reading time for HTML: {html_time} minutes")
+      print(f"Estimated reading time for Markdown: {markdown_time} minutes")
+    samples/html.html: |-
+      <html>
+      <head>
+          <title>Sample HTML</title>
+      </head>
+      <body>
+          <p>This is a sample HTML content to estimate reading time.</p>
+      </body>
+      </html>
+    samples/markdown.md: |-
+      # Sample Markdown
+      This is a sample markdown content to estimate reading time.
+    samples/plain_text.txt: This is a sample plain text to estimate reading time.
+    src/__init__.py: ""
+    src/read_time_calculator.py: |
+      from src.content_processor import ContentProcessor
+      from src.error_handler import ErrorHandler
+
+      class ReadTimeCalculator:
+          default_wpm = 265
+
+          def __init__(self):
+              self.content_processor = ContentProcessor()
+              self.error_handler = ErrorHandler()
+
+          def estimate_reading_time(self, content: str, wpm: int = None) -> int:
+              if wpm is None:
+                  wpm = self.default_wpm
+
+              # Determine content format
+              if content.strip().startswith('<'):
+                  format = 'html'
+              elif content.strip().startswith('#'):
+                  format = 'markdown'
+              else:
+                  format = 'plain_text'
+
+              # Validate input
+              self.error_handler.validate_input(content, format)
+
+              # Parse content
+              parsed_content = self.content_processor.parse_content(content, format)
+
+              # Calculate reading time
+              word_count = len(parsed_content.split())
+              reading_time = word_count / wpm
+              return round(reading_time)
+    src/content_processor.py: |
+      from bs4 import BeautifulSoup
+      import markdown2
+
+      class ContentProcessor:
+          def parse_content(self, content: str, format: str) -> str:
+              if format == 'html':
+                  return self.process_html(content)
+              elif format == 'markdown':
+                  return self.process_markdown(content)
+              elif format == 'plain_text':
+                  return self.process_plain_text(content)
+              else:
+                  raise ValueError("Unsupported content format")
+
+          def process_plain_text(self, content: str) -> str:
+              return content
+
+          def process_html(self, content: str) -> str:
+              soup = BeautifulSoup(content, 'lxml')
+              return soup.get_text()
+
+          def process_markdown(self, content: str) -> str:
+              html = markdown2.markdown(content)
+              return self.process_html(html)
+    src/error_handler.py: |
+      class ErrorHandler:
+          def handle_unsupported_format(self, format: str):
+              raise ValueError(f"Unsupported format: {format}")
+
+          def validate_input(self, content: str, format: str):
+              if not content:
+                  raise ValueError("Content cannot be empty")
+              if format not in ['plain_text', 'html', 'markdown']:
+                  self.handle_unsupported_format(format)
+    tests/__init__.py: ""
+    tests/test_read_time_calculator.py: |
+      import unittest
+      from src.read_time_calculator import ReadTimeCalculator
+
+      class TestReadTimeCalculator(unittest.TestCase):
+          def setUp(self):
+              self.calculator = ReadTimeCalculator()
+
+          def test_estimate_reading_time_plain_text(self):
+              content = "This is a sample plain text to estimate reading time."
+              self.assertEqual(self.calculator.estimate_reading_time(content, 265), 0)
+
+          def test_estimate_reading_time_html(self):
+              content = "<html><body><p>This is a sample HTML content to estimate reading time.</p></body></html>"
+              self.assertEqual(self.calculator.estimate_reading_time(content, 265), 0)
+
+          def test_estimate_reading_time_markdown(self):
+              content = "# Sample Markdown\nThis is a sample markdown content to estimate reading time."
+              self.assertEqual(self.calculator.estimate_reading_time(content, 265), 0)
+
+          def test_estimate_reading_time_with_different_wpm(self):
+              content = "This is a sample plain text to estimate reading time."
+              self.assertEqual(self.calculator.estimate_reading_time(content, 100), 1)
+
+      if __name__ == '__main__':
+          unittest.main()
+    tests/test_content_processor.py: |
+      import unittest
+      from src.content_processor import ContentProcessor
+
+      class TestContentProcessor(unittest.TestCase):
+          def setUp(self):
+              self.processor = ContentProcessor()
+
+          def test_process_plain_text(self):
+              content = "This is a sample plain text."
+              self.assertEqual(self.processor.process_plain_text(content), content)
+
+          def test_process_html(self):
+              content = "<html><body><p>This is a sample HTML content.</p></body></html>"
+              expected_output = "This is a sample HTML content."
+              self.assertEqual(self.processor.process_html(content), expected_output)
+
+          def test_process_markdown(self):
+              content = "# Sample Markdown\nThis is a sample markdown content."
+              expected_output = "Sample Markdown\nThis is a sample markdown content."
+              self.assertEqual(self.processor.process_markdown(content), expected_output)
+
+      if __name__ == '__main__':
+          unittest.main()
+    tests/test_error_handler.py: |
+      import unittest
+      from src.error_handler import ErrorHandler
+
+      class TestErrorHandler(unittest.TestCase):
+          def setUp(self):
+              self.handler = ErrorHandler()
+
+          def test_handle_unsupported_format(self):
+              with self.assertRaises(ValueError):
+                  self.handler.handle_unsupported_format('unsupported')
+
+          def test_validate_input_empty_content(self):
+              with self.assertRaises(ValueError):
+                  self.handler.validate_input('', 'plain_text')
+
+          def test_validate_input_unsupported_format(self):
+              with self.assertRaises(ValueError):
+                  self.handler.validate_input('Some content', 'unsupported')
+
+      if __name__ == '__main__':
+          unittest.main()
+    requirements.txt: |-
+      beautifulsoup4
+      lxml
+      markdown2
+      pytest
+      pyquery
+      unittest
+    README.md: |
+      # ReadTime Project
+
+      ## Overview
+      The ReadTime project is a Python-based tool designed to estimate the reading time for various content formats, including plain text, HTML, and markdown. It provides users with an approximate reading time based on a standard or user-defined words-per-minute (WPM) rate.
+
+      ## Features
+      - Processes plain text, HTML, and markdown content.
+      - Estimates reading time based on a specified WPM rate (default is 265).
+      - Handles errors and validates input formats.
+
+      ## Installation
+      1. Clone the repository:
+         ```bash
+         git clone <repository-url>
+         ```
+      2. Navigate to the project directory:
+         ```bash
+         cd ReadTimeProject
+         ```
+      3. Install the required dependencies:
+         ```bash
+         pip install -r requirements.txt
+         ```
+
+      ## Usage
+      To estimate reading time, run the following script:
+      ```bash
+      python examples/demo.py
+      ```
+
+      ## Testing
+      Run the tests using:
+      ```bash
+      pytest tests/
+      ```
+
+      ## License
+      This project is licensed under the MIT License.
+  acceptance_tests: |-
+    import pytest
+    from src.read_time_calculator import ReadTimeCalculator
+    from src.content_processor import ContentProcessor
+    from src.error_handler import ErrorHandler
+
+    # Sample data paths
+    HTML_SAMPLE_PATH = './samples/html.html'
+    MARKDOWN_SAMPLE_PATH = './samples/markdown.md'
+    PLAIN_TEXT_SAMPLE_PATH = './samples/plain_text.txt'
+
+    # Helper function to read sample files
+    def read_sample_file(file_path):
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.read()
+
+    # Test cases for ReadTimeCalculator
+    def test_estimate_reading_time_plain_text():
+        calculator = ReadTimeCalculator()
+        content = read_sample_file(PLAIN_TEXT_SAMPLE_PATH)
+        reading_time = calculator.estimate_reading_time(content, calculator.default_wpm)
+        assert isinstance(reading_time, int)
+        assert reading_time > 0
+
+    def test_estimate_reading_time_html():
+        calculator = ReadTimeCalculator()
+        content = read_sample_file(HTML_SAMPLE_PATH)
+        reading_time = calculator.estimate_reading_time(content, calculator.default_wpm)
+        assert isinstance(reading_time, int)
+        assert reading_time > 0
+
+
+    def test_estimate_reading_time_markdown():
+        calculator = ReadTimeCalculator()
+        content = read_sample_file(MARKDOWN_SAMPLE_PATH)
+        reading_time = calculator.estimate_reading_time(content, calculator.default_wpm)
+        assert isinstance(reading_time, int)
+        assert reading_time > 0
+
+
+    def test_estimate_reading_time_custom_wpm():
+        calculator = ReadTimeCalculator()
+        content = read_sample_file(PLAIN_TEXT_SAMPLE_PATH)
+        custom_wpm = 300
+        reading_time = calculator.estimate_reading_time(content, custom_wpm)
+        assert isinstance(reading_time, int)
+        assert reading_time > 0
+
+    # Test cases for ErrorHandler
+    def test_handle_unsupported_format():
+        error_handler = ErrorHandler()
+        with pytest.raises(Exception):
+            error_handler.handle_unsupported_format('unsupported_format')
+
+
+    def test_validate_input_valid():
+        error_handler = ErrorHandler()
+        content = read_sample_file(PLAIN_TEXT_SAMPLE_PATH)
+        result = error_handler.validate_input(content, 'plain_text')
+        assert result is None  # Assuming no exception means valid input
+
+
+    def test_validate_input_invalid():
+        error_handler = ErrorHandler()
+        with pytest.raises(Exception):
+            error_handler.validate_input('', 'plain_text')
+
+    # Test cases for ContentProcessor
+    def test_parse_content_plain_text():
+        processor = ContentProcessor()
+        content = read_sample_file(PLAIN_TEXT_SAMPLE_PATH)
+        parsed_content = processor.parse_content(content, 'plain_text')
+        assert isinstance(parsed_content, str)
+        assert len(parsed_content) > 0
+
+
+    def test_parse_content_html():
+        processor = ContentProcessor()
+        content = read_sample_file(HTML_SAMPLE_PATH)
+        parsed_content = processor.parse_content(content, 'html')
+        assert isinstance(parsed_content, str)
+        assert len(parsed_content) > 0
+
+
+    def test_parse_content_markdown():
+        processor = ContentProcessor()
+        content = read_sample_file(MARKDOWN_SAMPLE_PATH)
+        parsed_content = processor.parse_content(content, 'markdown')
+        assert isinstance(parsed_content, str)
+        assert len(parsed_content) > 0
+
+    if __name__ == "__main__":
+        pytest.main()
+  unit_tests: |
+    import unittest
+    from src.read_time_calculator import ReadTimeCalculator
+    from src.content_processor import ContentProcessor
+    from src.error_handler import ErrorHandler
+
+    class TestReadTimeCalculator(unittest.TestCase):
+        def setUp(self):
+            self.calculator = ReadTimeCalculator()
+
+        def test_estimate_reading_time_plain_text(self):
+            content = "This is a simple plain text for testing."
+            wpm = 200
+            expected_time = 1  # Assuming 9 words, 200 WPM
+            self.assertEqual(self.calculator.estimate_reading_time(content, wpm), expected_time)
+
+        def test_estimate_reading_time_html(self):
+            content = "<p>This is a simple HTML content for testing.</p>"
+            wpm = 200
+            expected_time = 1  # Assuming 9 words, 200 WPM
+            self.assertEqual(self.calculator.estimate_reading_time(content, wpm), expected_time)
+
+        def test_estimate_reading_time_markdown(self):
+            content = "# Header\nThis is a simple markdown content for testing."
+            wpm = 200
+            expected_time = 1  # Assuming 9 words, 200 WPM
+            self.assertEqual(self.calculator.estimate_reading_time(content, wpm), expected_time)
+
+        def test_default_wpm(self):
+            content = "This is a simple plain text for testing."
+            expected_time = 1  # Assuming 9 words, 265 WPM
+            self.assertEqual(self.calculator.estimate_reading_time(content), expected_time)
+
+        def test_unsupported_format(self):
+            content = "{ 'key': 'value' }"
+            with self.assertRaises(Exception):
+                self.calculator.estimate_reading_time(content, 200)
+
+    class TestContentProcessor(unittest.TestCase):
+        def setUp(self):
+            self.processor = ContentProcessor()
+
+        def test_parse_plain_text(self):
+            content = "This is a simple plain text for testing."
+            self.assertEqual(self.processor.parse_content(content, 'plain'), content)
+
+        def test_parse_html(self):
+            content = "<p>This is a simple HTML content for testing.</p>"
+            expected_parsed_content = "This is a simple HTML content for testing."
+            self.assertEqual(self.processor.parse_content(content, 'html'), expected_parsed_content)
+
+        def test_parse_markdown(self):
+            content = "# Header\nThis is a simple markdown content for testing."
+            expected_parsed_content = "Header This is a simple markdown content for testing."
+            self.assertEqual(self.processor.parse_content(content, 'markdown'), expected_parsed_content)
+
+    class TestErrorHandler(unittest.TestCase):
+        def setUp(self):
+            self.error_handler = ErrorHandler()
+
+        def test_handle_unsupported_format(self):
+            with self.assertRaises(Exception):
+                self.error_handler.handle_unsupported_format('json')
+
+        def test_validate_input_valid(self):
+            content = "This is a simple plain text for testing."
+            try:
+                self.error_handler.validate_input(content, 'plain')
+            except Exception:
+                self.fail("validate_input raised Exception unexpectedly!")
+
+        def test_validate_input_invalid(self):
+            content = ""
+            with self.assertRaises(Exception):
+                self.error_handler.validate_input(content, 'plain')
+
+    if __name__ == '__main__':
+        unittest.main()

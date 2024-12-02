@@ -1,7 +1,8 @@
 .env
 system/tester.ipynb
 system/sample.py
-outputs/
+outputs/*
+!outputs/v5
 system/__pycache__/
 temp/
 .gitignore

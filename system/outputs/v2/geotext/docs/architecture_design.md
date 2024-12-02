@@ -1,0 +1,13 @@
+geotext/
+    README.md
+    geotext/
+        __init__.py
+        geotext.py
+        data_file/
+            citypatches.txt
+            countryInfo.txt
+            nationalities.txt
+            cities15000.txt
+    examples/
+        example_usage.sh
+        demo.py

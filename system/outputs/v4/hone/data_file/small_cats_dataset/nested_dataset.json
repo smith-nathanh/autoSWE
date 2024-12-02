@@ -1,0 +1,14 @@
+[
+    {
+        "adopted": "TRUE",
+        "adopted_since": "2012",
+        "age (years)": "5",
+        "birth": {
+            "day": "11",
+            "month": "April",
+            "year": "2011"
+        },
+        "name": "Tommy",
+        "weight (kg)": "3.6"
+    }
+]

@@ -1,0 +1,2 @@
+This is a sample plain text file to test reading time estimation.
+It contains multiple lines of text to simulate a longer document.

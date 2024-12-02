@@ -1,0 +1,3 @@
+# Template for CC BY License
+
+<Insert CC BY License Text Here>

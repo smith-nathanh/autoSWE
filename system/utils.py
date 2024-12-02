@@ -6,15 +6,19 @@ import copy
 from typing import Dict, List, Union
 
 def get_root_dir(files: Dict[str, str]) -> str:
-    # Check if all filenames have the same root directory
-    root_dirs = {filename.split('/')[0] for filename in files.keys()}
+    """Extract common root directory from file paths"""
+    if not files:
+        return "project-root/"
+        
+    paths = list(files.keys())
+    common_prefix = os.path.commonpath(paths)
     
-    if len(root_dirs) > 1:
-        # Multiple different root dirs found implying that a root directory was never specified
-        return ""
-    else:
-        # All files have same root dir
-        return next(iter(root_dirs)) + '/' if root_dirs else ""
+    # If no common prefix found, default to project-root
+    if not common_prefix or common_prefix == '/':
+        return "project-root/"
+        
+    # Ensure trailing slash
+    return common_prefix if common_prefix.endswith('/') else f"{common_prefix}/"
 
 def check_and_install_packages(packages: List[str]) -> Dict[str, Dict[str, Union[bool, str]]]:
     """Check if packages are installed and install if needed"""

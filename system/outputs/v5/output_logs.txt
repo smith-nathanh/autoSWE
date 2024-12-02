@@ -1,0 +1,533 @@
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/ArXiv_digest/docs/PRD.md
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR: Could not find a version that satisfies the requirement src.utils.api_interaction (from versions: none)
+ERROR: No matching distribution found for src.utils.api_interaction
+ERROR: Could not find a version that satisfies the requirement src.utils.xml_parser (from versions: none)
+ERROR: No matching distribution found for src.utils.xml_parser
+ERROR: Could not find a version that satisfies the requirement src.csv_handler (from versions: none)
+ERROR: No matching distribution found for src.csv_handler
+ERROR: Could not find a version that satisfies the requirement src.command_line_interface (from versions: none)
+ERROR: No matching distribution found for src.command_line_interface
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR: Could not find a version that satisfies the requirement src.utils.api_interaction (from versions: none)
+ERROR: No matching distribution found for src.utils.api_interaction
+ERROR: Could not find a version that satisfies the requirement src.utils.xml_parser (from versions: none)
+ERROR: No matching distribution found for src.utils.xml_parser
+ERROR: Could not find a version that satisfies the requirement src.csv_handler (from versions: none)
+ERROR: No matching distribution found for src.csv_handler
+ERROR: Could not find a version that satisfies the requirement src.command_line_interface (from versions: none)
+ERROR: No matching distribution found for src.command_line_interface
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Unit tests failed to cover at least 60% please revise unit tests: 
+Name                           Stmts   Miss  Cover
+--------------------------------------------------
+src\query_arxiv.py                71     62    13%
+src\utils\api_interaction.py       4      2    50%
+src\utils\xml_parser.py           15     12    20%
+--------------------------------------------------
+TOTAL                             90     76    16%
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+ERROR: Could not find a version that satisfies the requirement src.utils.api_interaction (from versions: none)
+ERROR: No matching distribution found for src.utils.api_interaction
+ERROR: Could not find a version that satisfies the requirement src.utils.xml_parser (from versions: none)
+ERROR: No matching distribution found for src.utils.xml_parser
+ERROR: Could not find a version that satisfies the requirement src.csv_handler (from versions: none)
+ERROR: No matching distribution found for src.csv_handler
+ERROR: Could not find a version that satisfies the requirement src.command_line_interface (from versions: none)
+ERROR: No matching distribution found for src.command_line_interface
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Unit tests failed to cover at least 60% please revise unit tests: 
+Name                           Stmts   Miss  Cover
+--------------------------------------------------
+src\query_arxiv.py                71     62    13%
+src\utils\api_interaction.py       4      2    50%
+src\utils\xml_parser.py           15     12    20%
+--------------------------------------------------
+TOTAL                             90     76    16%
+
+caused by requirements.txt including requirements to download
+os
+argparse
+unittest
+urllib
+xml.etree.ElementTree
+csv
+datetime
+src.utils.api_interaction
+src.utils.xml_parser
+src.csv_handler
+src.command_line_interface
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/ArXiv_digest/docs/PRD.md        
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report successful: 
+Name                           Stmts   Miss  Cover
+--------------------------------------------------
+src\paper.py                      11      1    91%
+src\query_arxiv.py                51     14    73%
+src\utils\api_interaction.py       4      0   100%
+src\utils\date_filter.py           4      0   100%
+src\utils\output_handler.py       17      0   100%
+src\utils\xml_parser.py           14      0   100%
+--------------------------------------------------
+TOTAL                            101     15    85%
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/chakin/PRD.md                   
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Requirement already satisfied: progressbar2 in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (4.5.0)
+Requirement already satisfied: python-utils>=3.8.1 in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (from progressbar2) (3.9.0)
+Requirement already satisfied: typing-extensions>3.10.0.2 in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (from python-utils>=3.8.1->progressbar2) (4.12.2)
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report successful: 
+Name                        Stmts   Miss  Cover
+-----------------------------------------------
+chakin\chakin.py               22      0   100%
+chakin\dataset_manager.py      11      0   100%
+chakin\progress_bar.py          7      0   100%
+chakin\word_vector.py          13      0   100%
+-----------------------------------------------
+TOTAL                          53      0   100%
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/geotext/PRD.md
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/hone/docs/PRD.md
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Unit tests failed to cover at least 60% please revise unit tests: 
+Name                    Stmts   Miss  Cover
+-------------------------------------------
+src\cli.py                 24     17    29%
+src\csv_parser.py          16     10    38%
+src\file_manager.py         5      2    60%
+src\json_generator.py      16     11    31%
+-------------------------------------------
+TOTAL                      61     40    34%
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/hone/docs/PRD.md        
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report successful: 
+Name                    Stmts   Miss  Cover
+-------------------------------------------
+src\cli.py                 24      1    96%
+src\csv_parser.py          16      0   100%
+src\file_manager.py         5      0   100%
+src\json_generator.py      21      5    76%
+-------------------------------------------
+TOTAL                      66      6    91%
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/Hybrid_Images/docs/PRD.md
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Requirement already satisfied: opencv-python in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (4.10.0.84)
+Requirement already satisfied: numpy>=1.21.2 in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (from opencv-python) (2.1.3)
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Requirement already satisfied: opencv-python in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (4.10.0.84)
+Requirement already satisfied: numpy>=1.21.2 in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (from opencv-python) (2.1.3)
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No source for code: 'C:\Users\smith\code\autoSWE\temp\project-root\config-3.py'.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Requirement already satisfied: opencv-python in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (4.10.0.84)
+Requirement already satisfied: numpy>=1.21.2 in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (from opencv-python) (2.1.3)
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No source for code: 'C:\Users\smith\code\autoSWE\temp\project-root\config-3.py'.
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/lice/PRD.md                      
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Unit tests failed to cover at least 60% please revise unit tests: 
+Name          Stmts   Miss  Cover
+---------------------------------
+src\core.py       8      6    25%
+---------------------------------
+TOTAL             8      6    25%
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Unit tests failed to cover at least 60% please revise unit tests: 
+Name          Stmts   Miss  Cover
+---------------------------------
+src\core.py       8      6    25%
+---------------------------------
+TOTAL             8      6    25%
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/particle-swarm-optimization/docs/PRD.md
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report successful: 
+Name                   Stmts   Miss  Cover
+------------------------------------------
+src\cost_function.py       3      0   100%
+src\particle.py           22      2    91%
+src\pso.py                45     15    67%
+------------------------------------------
+TOTAL                     70     17    76%
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/readtime/docs/PRD.md                           
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+Requirement already satisfied: beautifulsoup4 in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (4.11.1)
+Requirement already satisfied: soupsieve>1.2 in c:\users\smith\anaconda3\envs\lc_env\lib\site-packages (from beautifulsoup4) (2.3.2.post1)
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report successful: 
+Name                          Stmts   Miss  Cover
+-------------------------------------------------
+src\content_parser.py            12      0   100%
+src\error_handler.py              7      0   100%
+src\read_time_calculator.py      20      1    95%
+-------------------------------------------------
+TOTAL                            39      1    97%
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/stocktrends/docs/PRD.md     
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report successful: 
+Name                              Stmts   Miss  Cover
+-----------------------------------------------------
+src\financial_data_processor.py       7      0   100%
+src\indicator_calculator.py           8      0   100%
+src\instrument_analyzer.py            4      0   100%
+src\report_generator.py               3      0   100%
+src\test_validator.py                 6      0   100%
+-----------------------------------------------------
+TOTAL                                28      0   100%
+
+Looks like placeholders so reran
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/stocktrends/docs/PRD.md        
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report successful: 
+Name                              Stmts   Miss  Cover
+-----------------------------------------------------
+src\financial_data_processor.py       7      0   100%
+src\indicator_calculator.py          32      4    88%
+src\instrument_analyzer.py           12      0   100%
+src\report_generator.py               7      0   100%
+-----------------------------------------------------
+TOTAL                                58      4    93%
+
+(lc_env) PS C:\Users\smith\code\autoSWE> python -m system.main --prd_path system/benchmark_data/python/TextCNN/PRD.md                 
+INFO:root:TRACING True
+INFO:root:autoSWE-1
+INFO:root:---SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE SOFTWARE DESIGN---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE IMPLEMENTATION---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ACCEPTANCE TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:datasets:PyTorch version 2.5.1 available.
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+
+INFO:root:---UNIT TESTS---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---ENVIRONMENT SETUP---
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:root:---APPROVE ACCEPTANCE TESTS---
+INFO:root:---APPROVE UNIT TESTS---
+INFO:root:Coverage report failed execution: No data to report.
+

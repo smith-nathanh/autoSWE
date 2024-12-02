@@ -1,0 +1,1 @@
+ISO3	ISO-Numeric	fips	Country	Capital	Area	Population	Continent	tld	CurrencyCode	CurrencyName	Phone	Postal Code Format	Postal Code Regex	Languages	geonameid	neighbours	EquivalentFipsCode
