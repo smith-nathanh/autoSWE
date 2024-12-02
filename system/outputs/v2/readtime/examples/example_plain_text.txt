@@ -1,1 +1,0 @@
-This is an example plain text content to test reading time estimation.

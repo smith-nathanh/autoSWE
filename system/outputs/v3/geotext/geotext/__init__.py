@@ -1,1 +1,0 @@
-from .geotext import GeoText

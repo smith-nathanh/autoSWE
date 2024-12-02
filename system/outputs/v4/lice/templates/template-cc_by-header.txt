@@ -1,6 +1,0 @@
-// Creative Commons Attribution 4.0 International License Header
-// Copyright (c) {{year}} {{organization}}
-//
-// This is a human-readable summary of (and not a substitute for) the license.
-// Disclaimer.
-// ...

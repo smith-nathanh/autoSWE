@@ -1,3 +1,0 @@
-# Template for BSD2 License
-
-<Insert BSD2 License Text Here>

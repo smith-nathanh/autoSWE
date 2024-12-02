@@ -1,3 +1,0 @@
-# Header Template for Apache License
-
-<Insert Apache Header Text Here>

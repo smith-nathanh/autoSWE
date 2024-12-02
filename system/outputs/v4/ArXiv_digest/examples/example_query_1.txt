@@ -1,5 +1,0 @@
-Category: cs.CL
-Title: neural
-Author: Smith
-Abstract: learning
-Recent Days: 30

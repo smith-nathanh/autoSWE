@@ -1,3 +1,0 @@
-# Header Template for CC BY License
-
-<Insert CC BY Header Text Here>

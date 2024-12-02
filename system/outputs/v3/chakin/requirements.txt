@@ -1,5 +1,0 @@
-pandas
-progressbar2
-six
-requests
-unittest

@@ -1,3 +1,0 @@
-# Template for AGPL3 License
-
-<Insert AGPL3 License Text Here>

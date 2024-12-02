@@ -1,5 +1,0 @@
-Category: cs.AI
-Title: machine
-Author: Doe
-Abstract: intelligence
-Recent Days: 15
