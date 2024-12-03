@@ -2,6 +2,7 @@
 system/tester.ipynb
 system/sample.py
 system/__pycache__/
+system/outputs/v5_eval
 temp/
 .gitignore
 __pycache__/

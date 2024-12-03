@@ -74,8 +74,8 @@ except ImportError as e:
     
     print(f"Package {package_name} check results:")
     print(f"Return code: {result['returncode']}")
-    print(f"Stdout: {result['stdout']}")
-    print(f"Stderr: {result['stderr']}")
+    print(f"Stdout: {result['stdout'].strip()}")
+    print(f"Stderr: {result['stderr'].strip()}")
     print(f"Is installed: {success}")
     
     return success
@@ -189,13 +189,16 @@ def process_directory(directory):
                         })
 
     # Acceptance tests
+    print('Running acceptance tests...')
     result["acceptance_tests"] = run_command("conda run -n myenv python -m unittest tests/acceptance/test_features.py")
 
     # Unit tests
+    print('Running unit tests...')
     result["unit_tests"]["run_tests"] = run_command("conda run -n myenv coverage run -m unittest tests/unit/test_module.py")
     result["unit_tests"]["coverage_report"] = run_command("conda run -n myenv coverage report")
 
     # Deactivate conda environment
+    print('Deactivating conda environment...')
     result["environment_setup"]["activate_conda_env"] = run_command("conda deactivate")
 
     # Write the result to a JSON file
@@ -225,7 +228,7 @@ def main():
     # Get the list of directories from the specified key
     directories = config.get(config_key, {})
 
-    for directory in directories.keys():
+    for directory in ["ArXiv_digest"]: #[directory for directory in directories.keys() if directory != "ArXiv_digest"]:
         dir_path = os.path.join(base_dir, directory)
         if os.path.isdir(dir_path):
             print('Processing directory:', dir_path)

@@ -131,3 +131,4 @@ if __name__ == "__main__":
     #print(json.dumps(results, indent=2))
     df = json_to_dataframe(results)
     print(df)
+    df.to_csv(f'{args.base_path}/evaluation_results.csv')
